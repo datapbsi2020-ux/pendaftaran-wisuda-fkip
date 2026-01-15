@@ -3,388 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendaftaran Wisuda FKIP - Universitas Wiralodra</title>
+    <title>Sistem Wisuda FKIP - Universitas Wiralodra</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-card { background: rgba(255, 255, 255, 0.98); }
         
         /* Tampilan Khusus Cetak/Print */
         @media print {
-            body * { visibility: hidden; } /* Sembunyikan semua elemen body */
-            #previewSection, #previewSection * { visibility: visible; } /* Tampilkan hanya bagian preview */
-            #previewSection { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                margin: 0; 
-                padding: 0; 
-                background: white; 
-                box-shadow: none; 
-            }
-            .no-print { display: none !important; } /* Tombol edit/cetak hilang saat diprint */
+            body * { visibility: hidden; }
+            #previewSection, #previewSection * { visibility: visible; }
+            #previewSection { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white; box-shadow: none; }
+            .no-print { display: none !important; }
             body { background: white; }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 min-h-screen py-10 px-4">
+<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 min-h-screen text-gray-800">
 
-    <div id="inputSection" class="max-w-4xl mx-auto glass-card rounded-2xl shadow-2xl overflow-hidden bg-white transition-all duration-500">
-        <div class="bg-blue-900 p-8 text-white text-center border-b-4 border-yellow-400">
-            <h1 class="text-2xl font-bold uppercase tracking-wider mb-1">Formulir Pendaftaran Wisuda</h1>
-            <h2 class="text-xl font-bold uppercase tracking-wide mb-1 text-yellow-400">Fakultas Keguruan dan Ilmu Pendidikan</h2>
-            <h3 class="text-lg opacity-90 font-medium tracking-wide">Universitas Wiralodra</h3>
+    <nav class="bg-blue-900 text-white p-4 shadow-lg no-print">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="font-bold text-lg flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-yellow-400"></i> SIP-WISUDA FKIP
+            </div>
+            <div class="space-x-4">
+                <button onclick="showPage('inputSection')" class="hover:text-yellow-400 transition"><i class="fas fa-edit"></i> Daftar</button>
+                <button onclick="checkLogin()" class="bg-yellow-500 text-blue-900 px-4 py-1 rounded font-bold hover:bg-yellow-400 transition"><i class="fas fa-user-shield"></i> Admin</button>
+            </div>
         </div>
+    </nav>
 
-        <form id="wisudaForm" class="p-8 md:p-10 space-y-6" onsubmit="handlePreview(event)">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-5 rounded-xl border border-blue-100">
-                <div>
-                    <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Gelombang Wisuda</label>
-                    <select id="input_gelombang" class="w-full border-gray-300 border p-2 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                        <option value="">-- Pilih Gelombang --</option>
-                        <option value="I">Gelombang I</option>
-                        <option value="II">Gelombang II</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Tahun Akademik</label>
-                    <select id="input_tahun" class="w-full border-gray-300 border p-2 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                        <option value="">-- Pilih Tahun --</option>
-                        <option value="2025">2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="2028">2028</option>
-                        <option value="2029">2029</option>
-                        <option value="2030">2030</option>
-                    </select>
-                </div>
+    <div class="py-10 px-4">
+
+        <div id="inputSection" class="max-w-4xl mx-auto glass-card rounded-2xl shadow-2xl overflow-hidden bg-white transition-all duration-500">
+            <div class="bg-blue-900 p-8 text-white text-center border-b-4 border-yellow-400">
+                <h1 class="text-2xl font-bold uppercase tracking-wider mb-1">Formulir Pendaftaran Wisuda</h1>
+                <h2 class="text-xl font-bold uppercase tracking-wide mb-1 text-yellow-400">Fakultas Keguruan dan Ilmu Pendidikan</h2>
+                <h3 class="text-lg opacity-90 font-medium tracking-wide">Universitas Wiralodra</h3>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-                <div class="space-y-4">
-                    <h3 class="font-bold text-blue-800 border-b pb-1 uppercase text-sm italic">Identitas Mahasiswa</h3>
+            <form id="wisudaForm" class="p-8 md:p-10 space-y-6" onsubmit="handleSimpan(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-5 rounded-xl border border-blue-100">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">Nama Lengkap</label>
-                        <input type="text" id="input_nama" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" placeholder="Sesuai Ijazah" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">NPM</label>
-                        <input type="text" id="input_npm" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Program Studi</label>
-                        <select id="input_prodi" class="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition" required>
-                            <option value="">-- Pilih Prodi --</option>
-                            <option>Pendidikan Bahasa dan Sastra Indonesia</option>
-                            <option>Pendidikan Bahasa Inggris</option>
-                            <option>Pendidikan Matematika</option>
-                            <option>Pendidikan Biologi</option>
+                        <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Gelombang Wisuda</label>
+                        <select id="input_gelombang" class="w-full border p-2 rounded bg-white" required>
+                            <option value="I">Gelombang I</option>
+                            <option value="II" selected>Gelombang II</option>
                         </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Tahun Akademik</label>
+                        <select id="input_tahun" class="w-full border p-2 rounded bg-white" required>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-blue-800 border-b pb-1 uppercase text-sm italic">Identitas Mahasiswa</h3>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Nama Lengkap</label><input type="text" id="input_nama" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">NPM</label><input type="text" id="input_npm" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Kelas</label>
-                            <select id="input_kelas" class="w-full border p-2 rounded-lg text-sm bg-gray-50" required>
-                                <option>Reguler</option>
-                                <option>Nonreguler</option>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Program Studi</label>
+                            <select id="input_prodi" class="w-full border p-2 rounded mt-1 bg-gray-50" required>
+                                <option>Pendidikan Bahasa dan Sastra Indonesia</option>
+                                <option>Pendidikan Bahasa Inggris</option>
+                                <option>Pendidikan Matematika</option>
+                                <option>Pendidikan Biologi</option>
                             </select>
                         </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="text-xs font-bold text-gray-500 uppercase">Kelas</label><select id="input_kelas" class="w-full border p-2 rounded mt-1"><option>Reguler</option><option>Nonreguler</option></select></div>
+                            <div><label class="text-xs font-bold text-gray-500 uppercase">Jenjang</label><select id="input_jenjang" class="w-full border p-2 rounded mt-1"><option>Sarjana</option><option>Magister</option></select></div>
+                        </div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">TTL</label><input type="text" id="input_ttl" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Jenjang</label>
-                            <select id="input_jenjang" class="w-full border p-2 rounded-lg text-sm bg-gray-50">
-                                <option>Sarjana</option>
-                                <option>Magister</option>
-                            </select>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Jenis Kelamin</label>
+                            <div class="flex gap-4 mt-2">
+                                <label class="flex items-center gap-2"><input type="radio" name="jk" value="Laki-laki" checked> Laki-laki</label>
+                                <label class="flex items-center gap-2"><input type="radio" name="jk" value="Perempuan"> Perempuan</label>
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">Tempat, Tanggal Lahir</label>
-                        <input type="text" id="input_ttl" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" placeholder="Contoh: Indramayu, 01 Januari 2000" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Jenis Kelamin</label>
-                        <div class="flex gap-4">
-                            <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="jk" value="Laki-laki" class="accent-blue-600" checked> <span class="text-sm">Laki-laki</span>
-                            </label>
-                            <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="jk" value="Perempuan" class="accent-blue-600"> <span class="text-sm">Perempuan</span>
-                            </label>
+
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-blue-800 border-b pb-1 uppercase text-sm italic">Kontak & Akademik</h3>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">NIK</label><input type="text" id="input_nik" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Nama Ibu</label><input type="text" id="input_ibu" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Email</label><input type="email" id="input_email" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">No. HP</label><input type="text" id="input_hp" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Tanggal Lulus</label><input type="date" id="input_tgl_lulus" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="text-xs font-bold text-gray-500 uppercase">IPK</label><input type="number" step="0.01" id="input_ipk" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                            <div><label class="text-xs font-bold text-gray-500 uppercase">Yudisium</label><input type="text" id="input_yudisium" class="w-full border-b py-2 focus:border-blue-600 outline-none"></div>
                         </div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Alamat</label><textarea id="input_alamat" class="w-full border-b py-2 focus:border-blue-600 outline-none h-10 resize-none"></textarea></div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <h3 class="font-bold text-blue-800 border-b pb-1 uppercase text-sm italic">Data Kontak & Keluarga</h3>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">NIK (Sesuai KTP)</label>
-                        <input type="text" id="input_nik" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" maxlength="16" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">Nama Ibu Kandung</label>
-                        <input type="text" id="input_ibu" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">Email</label>
-                        <input type="email" id="input_email" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">No. HP/WhatsApp</label>
-                        <input type="text" id="input_hp" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" required>
-                    </div>
+                <div class="bg-gray-50 p-4 rounded border border-dashed border-gray-400 mt-4 text-sm">
+                    <p class="font-bold mb-2">Lampiran (Wajib dibawa saat verifikasi):</p>
+                    <ul class="list-disc list-inside text-gray-600">
+                        <li>Fotokopi Ijazah Legalisir</li>
+                        <li>Fotokopi KTP</li>
+                        <li>Surat Bebas Biaya</li>
+                        <li>Sertifikat PKKMB</li>
+                    </ul>
                 </div>
-            </div>
 
-            <div class="space-y-4">
-                <h3 class="font-bold text-blue-800 border-b pb-1 uppercase text-sm italic">Informasi Kelulusan</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">Tanggal Kelulusan</label>
-                        <input type="date" id="input_tgl_lulus" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">IPK</label>
-                        <input type="number" step="0.01" id="input_ipk" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition" placeholder="0.00" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase">Yudisium</label>
-                        <input type="text" id="input_yudisium" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition">
-                    </div>
+                <div class="pt-6 flex justify-center">
+                    <button type="submit" class="bg-blue-900 text-white px-12 py-3 rounded-full font-bold hover:bg-blue-800 shadow-lg uppercase tracking-widest text-sm transition transform hover:-translate-y-1">
+                        <i class="fas fa-save mr-2"></i> Simpan & Lihat Preview
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase">Alamat Rumah Lengkap</label>
-                    <textarea id="input_alamat" class="w-full border-b border-gray-300 py-2 outline-none focus:border-blue-600 transition h-16 resize-none" required></textarea>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6">
-                <h3 class="font-bold text-gray-800 mb-4 text-sm uppercase">Lampiran Dokumen:</h3>
-                <div class="space-y-4 text-sm text-gray-700">
-                    <div class="flex items-center justify-between">
-                        <span>1) Ijazah Terakhir (Legalisir)</span>
-                        <input type="file" id="file_ijazah" class="text-xs">
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>2) KTP</span>
-                        <input type="file" id="file_ktp" class="text-xs">
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>3) Surat Bebas Biaya Pendidikan</span>
-                        <input type="file" id="file_bebas" class="text-xs">
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>4) Sertifikat PKKMB</span>
-                        <input type="file" id="file_pkkmb" class="text-xs">
-                    </div>
-                </div>
-            </div>
-
-            <div class="pt-6 flex justify-center">
-                <button type="submit" class="bg-blue-900 text-white px-12 py-3 rounded-full font-bold hover:bg-blue-800 shadow-lg transition uppercase tracking-widest text-sm transform hover:-translate-y-1">
-                    Simpan & Lanjut Preview
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <div id="previewSection" class="hidden max-w-4xl mx-auto bg-white p-12 shadow-2xl min-h-screen">
-        <div class="text-center border-b-2 border-black pb-4 mb-8">
-            <h1 class="text-xl font-bold uppercase tracking-wide">Formulir Pendaftaran Wisuda</h1>
-            <h2 class="text-lg font-bold uppercase tracking-wide">Fakultas Keguruan dan Ilmu Pendidikan</h2>
-            <h3 class="text-lg font-medium">Universitas Wiralodra</h3>
-            <p class="text-sm mt-2">Gelombang <span id="prev_gelombang" class="font-bold"></span> Tahun Akademik <span id="prev_tahun" class="font-bold"></span></p>
+            </form>
         </div>
 
-        <table class="w-full text-sm leading-8">
-            <tr>
-                <td class="w-1/3 font-bold">Nama Lengkap</td>
-                <td class="w-2">:</td>
-                <td id="prev_nama" class="uppercase"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">NPM</td>
-                <td>:</td>
-                <td id="prev_npm"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Program Studi</td>
-                <td>:</td>
-                <td id="prev_prodi"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Jenjang / Kelas</td>
-                <td>:</td>
-                <td><span id="prev_jenjang"></span> / <span id="prev_kelas"></span></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Tempat, Tanggal Lahir</td>
-                <td>:</td>
-                <td id="prev_ttl"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Jenis Kelamin</td>
-                <td>:</td>
-                <td id="prev_jk"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">NIK</td>
-                <td>:</td>
-                <td id="prev_nik"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Nama Ibu Kandung</td>
-                <td>:</td>
-                <td id="prev_ibu"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Alamat Rumah</td>
-                <td>:</td>
-                <td id="prev_alamat"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Email</td>
-                <td>:</td>
-                <td id="prev_email"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">No. HP/WA</td>
-                <td>:</td>
-                <td id="prev_hp"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">Tanggal Kelulusan</td>
-                <td>:</td>
-                <td id="prev_tgl_lulus"></td>
-            </tr>
-            <tr>
-                <td class="font-bold">IPK / Yudisium</td>
-                <td>:</td>
-                <td><span id="prev_ipk"></span> / <span id="prev_yudisium"></span></td>
-            </tr>
-        </table>
+        <div id="previewSection" class="hidden max-w-4xl mx-auto bg-white p-12 shadow-2xl min-h-screen relative">
+            <div class="text-center border-b-2 border-black pb-4 mb-8">
+                <h1 class="text-xl font-bold uppercase">Formulir Pendaftaran Wisuda</h1>
+                <h2 class="text-lg font-bold uppercase">Fakultas Keguruan dan Ilmu Pendidikan</h2>
+                <h3 class="text-lg font-medium">Universitas Wiralodra</h3>
+                <p class="text-sm mt-2">Gelombang <span id="prev_gelombang" class="font-bold"></span> Tahun <span id="prev_tahun" class="font-bold"></span></p>
+            </div>
 
-        <div class="mt-8 border border-black p-4">
-            <p class="font-bold mb-2">Kelengkapan Dokumen (Checklist):</p>
-            <div class="space-y-1 text-sm">
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 border border-black flex items-center justify-center text-xs" id="check_ijazah"></div>
-                    <span>Fotokopi Ijazah Legalisir</span>
+            <table class="w-full text-sm leading-8">
+                <tr><td class="w-1/3 font-bold">Nama Lengkap</td><td class="w-2">:</td><td id="prev_nama" class="uppercase"></td></tr>
+                <tr><td class="font-bold">NPM</td><td>:</td><td id="prev_npm"></td></tr>
+                <tr><td class="font-bold">Prodi</td><td>:</td><td id="prev_prodi"></td></tr>
+                <tr><td class="font-bold">Kelas/Jenjang</td><td>:</td><td><span id="prev_kelas"></span> / <span id="prev_jenjang"></span></td></tr>
+                <tr><td class="font-bold">TTL</td><td>:</td><td id="prev_ttl"></td></tr>
+                <tr><td class="font-bold">Gender</td><td>:</td><td id="prev_jk"></td></tr>
+                <tr><td class="font-bold">NIK</td><td>:</td><td id="prev_nik"></td></tr>
+                <tr><td class="font-bold">Nama Ibu</td><td>:</td><td id="prev_ibu"></td></tr>
+                <tr><td class="font-bold">Alamat</td><td>:</td><td id="prev_alamat"></td></tr>
+                <tr><td class="font-bold">Kontak</td><td>:</td><td><span id="prev_email"></span> / <span id="prev_hp"></span></td></tr>
+                <tr><td class="font-bold">Akademik</td><td>:</td><td>Lulus: <span id="prev_tgl_lulus"></span> (IPK: <span id="prev_ipk"></span>)</td></tr>
+            </table>
+
+            <div class="mt-8 border border-black p-4">
+                <p class="font-bold mb-2 text-sm">Checklist Berkas:</p>
+                <div class="grid grid-cols-2 text-sm gap-2">
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 border border-black"></div> Ijazah Legalisir</div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 border border-black"></div> Fotokopi KTP</div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 border border-black"></div> Surat Bebas Biaya</div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 border border-black"></div> Sertifikat PKKMB</div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 border border-black flex items-center justify-center text-xs" id="check_ktp"></div>
-                    <span>Fotokopi KTP</span>
+            </div>
+
+            <div class="mt-12 flex justify-end">
+                <div class="text-center w-64">
+                    <p class="text-sm">Indramayu, <span id="prev_tanggal_cetak"></span></p>
+                    <p class="text-sm font-bold mb-20">Pendaftar,</p>
+                    <div class="border-b border-black"></div>
+                    <p class="text-xs mt-1 text-gray-500">( Tanda Tangan Mahasiswa )</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 border border-black flex items-center justify-center text-xs" id="check_bebas"></div>
-                    <span>Surat Keterangan Bebas Biaya</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 border border-black flex items-center justify-center text-xs" id="check_pkkmb"></div>
-                    <span>Sertifikat PKKMB</span>
-                </div>
+            </div>
+
+            <div class="mt-10 flex gap-4 justify-center no-print">
+                <button onclick="showPage('inputSection')" class="bg-gray-500 text-white px-6 py-2 rounded font-bold">Edit</button>
+                <button onclick="window.print()" class="bg-blue-900 text-white px-6 py-2 rounded font-bold shadow-lg">Cetak PDF</button>
+                <button onclick="resetForm()" class="bg-green-600 text-white px-6 py-2 rounded font-bold shadow-lg">Selesai (Form Baru)</button>
             </div>
         </div>
 
-        <div class="mt-12 flex justify-end">
-            <div class="text-center w-64">
-                <p class="text-sm">Indramayu, <span id="prev_tanggal_cetak"></span></p>
-                <p class="text-sm font-bold mb-20">Pendaftar,</p>
-                <div class="border-b border-black"></div>
-                <p class="text-xs mt-1 text-gray-500">( Tanda Tangan Mahasiswa )</p>
+        <div id="adminSection" class="hidden max-w-6xl mx-auto glass-card rounded-2xl shadow-2xl p-8 bg-white mt-4">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-database"></i> Database Pendaftar</h2>
+                <button onclick="logoutAdmin()" class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700">Keluar Admin</button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead class="bg-blue-900 text-white">
+                        <tr>
+                            <th class="py-2 px-4 border">No</th>
+                            <th class="py-2 px-4 border">Tgl Input</th>
+                            <th class="py-2 px-4 border">NPM</th>
+                            <th class="py-2 px-4 border">Nama</th>
+                            <th class="py-2 px-4 border">Prodi</th>
+                            <th class="py-2 px-4 border">HP</th>
+                            <th class="py-2 px-4 border">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody" class="text-sm text-center text-gray-700">
+                        </tbody>
+                </table>
+                <div id="emptyMsg" class="text-center py-8 text-gray-500 hidden">Belum ada data pendaftar.</div>
             </div>
         </div>
 
-        <div class="mt-10 flex gap-4 justify-center no-print">
-            <button onclick="editData()" class="bg-gray-500 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-600 transition">
-                Kembali / Edit
-            </button>
-            <button onclick="window.print()" class="bg-blue-900 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-xl">
-                Cetak Data (Print)
-            </button>
-        </div>
     </div>
 
     <script>
-        function handlePreview(event) {
-            event.preventDefault(); // Mencegah reload halaman
-
-            // Ambil Data Gelombang & Tahun
-            const gelombang = document.getElementById('input_gelombang').value;
-            const tahun = document.getElementById('input_tahun').value;
-
-            // Validasi sederhana jika dropdown belum dipilih
-            if(gelombang === "" || tahun === "") {
-                alert("Mohon pilih Gelombang dan Tahun Akademik terlebih dahulu.");
-                return;
-            }
-
-            document.getElementById('prev_gelombang').innerText = gelombang;
-            document.getElementById('prev_tahun').innerText = tahun;
-            
-            // Ambil Data Identitas
-            document.getElementById('prev_nama').innerText = document.getElementById('input_nama').value;
-            document.getElementById('prev_npm').innerText = document.getElementById('input_npm').value;
-            document.getElementById('prev_prodi').innerText = document.getElementById('input_prodi').value;
-            document.getElementById('prev_kelas').innerText = document.getElementById('input_kelas').value;
-            document.getElementById('prev_jenjang').innerText = document.getElementById('input_jenjang').value;
-            document.getElementById('prev_ttl').innerText = document.getElementById('input_ttl').value;
-            
-            // Radio button jenis kelamin
-            const jk = document.querySelector('input[name="jk"]:checked').value;
-            document.getElementById('prev_jk').innerText = jk;
-
-            document.getElementById('prev_nik').innerText = document.getElementById('input_nik').value;
-            document.getElementById('prev_ibu').innerText = document.getElementById('input_ibu').value;
-            document.getElementById('prev_alamat').innerText = document.getElementById('input_alamat').value;
-            document.getElementById('prev_email').innerText = document.getElementById('input_email').value;
-            document.getElementById('prev_hp').innerText = document.getElementById('input_hp').value;
-            
-            // Format Tanggal Kelulusan
-            const tglLulusInput = document.getElementById('input_tgl_lulus').value;
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            if(tglLulusInput) {
-                const tglLulus = new Date(tglLulusInput);
-                document.getElementById('prev_tgl_lulus').innerText = tglLulus.toLocaleDateString('id-ID', options);
-            }
-
-            document.getElementById('prev_ipk').innerText = document.getElementById('input_ipk').value;
-            document.getElementById('prev_yudisium').innerText = document.getElementById('input_yudisium').value;
-
-            // Tanggal Cetak Hari Ini
-            document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', options);
-
-            // Cek kelengkapan file (Simulasi Checklist)
-            checkFile('file_ijazah', 'check_ijazah');
-            checkFile('file_ktp', 'check_ktp');
-            checkFile('file_bebas', 'check_bebas');
-            checkFile('file_pkkmb', 'check_pkkmb');
-
-            // Ganti Tampilan ke Preview
+        // --- FUNGSI NAVIGASI ---
+        function showPage(pageId) {
             document.getElementById('inputSection').classList.add('hidden');
-            document.getElementById('previewSection').classList.remove('hidden');
-            
-            // Scroll ke atas
+            document.getElementById('previewSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById(pageId).classList.remove('hidden');
             window.scrollTo(0, 0);
         }
 
-        function checkFile(inputId, checkId) {
-            const input = document.getElementById(inputId);
-            const check = document.getElementById(checkId);
-            if (input.files.length > 0) {
-                check.innerText = "✓"; // Beri tanda centang jika ada file
-            } else {
-                check.innerText = "";
+        // --- FUNGSI SIMPAN DATA (CREATE) ---
+        function handleSimpan(e) {
+            e.preventDefault();
+
+            // 1. Ambil Data
+            const formData = {
+                id: Date.now(), // ID unik berdasarkan waktu
+                tgl_input: new Date().toLocaleDateString('id-ID'),
+                gelombang: document.getElementById('input_gelombang').value,
+                tahun: document.getElementById('input_tahun').value,
+                nama: document.getElementById('input_nama').value,
+                npm: document.getElementById('input_npm').value,
+                prodi: document.getElementById('input_prodi').value,
+                kelas: document.getElementById('input_kelas').value,
+                jenjang: document.getElementById('input_jenjang').value,
+                ttl: document.getElementById('input_ttl').value,
+                jk: document.querySelector('input[name="jk"]:checked').value,
+                nik: document.getElementById('input_nik').value,
+                ibu: document.getElementById('input_ibu').value,
+                email: document.getElementById('input_email').value,
+                hp: document.getElementById('input_hp').value,
+                tgl_lulus: document.getElementById('input_tgl_lulus').value,
+                ipk: document.getElementById('input_ipk').value,
+                yudisium: document.getElementById('input_yudisium').value,
+                alamat: document.getElementById('input_alamat').value
+            };
+
+            // 2. Simpan ke LocalStorage (Database Browser)
+            let database = JSON.parse(localStorage.getItem('db_wisuda')) || [];
+            database.push(formData);
+            localStorage.setItem('db_wisuda', JSON.stringify(database));
+
+            // 3. Tampilkan Preview
+            isiPreview(formData);
+            showPage('previewSection');
+            alert('Data Berhasil Disimpan!');
+        }
+
+        // --- FUNGSI PREVIEW ---
+        function isiPreview(data) {
+            document.getElementById('prev_gelombang').innerText = data.gelombang;
+            document.getElementById('prev_tahun').innerText = data.tahun;
+            document.getElementById('prev_nama').innerText = data.nama;
+            document.getElementById('prev_npm').innerText = data.npm;
+            document.getElementById('prev_prodi').innerText = data.prodi;
+            document.getElementById('prev_kelas').innerText = data.kelas;
+            document.getElementById('prev_jenjang').innerText = data.jenjang;
+            document.getElementById('prev_ttl').innerText = data.ttl;
+            document.getElementById('prev_jk').innerText = data.jk;
+            document.getElementById('prev_nik').innerText = data.nik;
+            document.getElementById('prev_ibu').innerText = data.ibu;
+            document.getElementById('prev_alamat').innerText = data.alamat;
+            document.getElementById('prev_email').innerText = data.email;
+            document.getElementById('prev_hp').innerText = data.hp;
+            document.getElementById('prev_tgl_lulus').innerText = data.tgl_lulus;
+            document.getElementById('prev_ipk').innerText = data.ipk;
+            document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+        }
+
+        function resetForm() {
+            document.getElementById('wisudaForm').reset();
+            showPage('inputSection');
+        }
+
+        // --- FUNGSI ADMIN ---
+        function checkLogin() {
+            const pass = prompt("Masukkan Password Admin:");
+            if (pass === "admin123") { // Password Sederhana
+                renderAdminTable();
+                showPage('adminSection');
+            } else if (pass !== null) {
+                alert("Password Salah!");
             }
         }
 
-        function editData() {
-            document.getElementById('previewSection').classList.add('hidden');
-            document.getElementById('inputSection').classList.remove('hidden');
-            window.scrollTo(0, 0);
+        function logoutAdmin() {
+            showPage('inputSection');
         }
+
+        function renderAdminTable() {
+            const database = JSON.parse(localStorage.getItem('db_wisuda')) || [];
+            const tbody = document.getElementById('adminTableBody');
+            const emptyMsg = document.getElementById('emptyMsg');
+            
+            tbody.innerHTML = ''; // Reset tabel
+
+            if (database.length === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+                // Loop data terbaru di atas
+                database.slice().reverse().forEach((item, index) => {
+                    let row = `
+                        <tr class="hover:bg-gray-50 border-b">
+                            <td class="py-2 border">${index + 1}</td>
+                            <td class="py-2 border">${item.tgl_input}</td>
+                            <td class="py-2 border">${item.npm}</td>
+                            <td class="py-2 border font-bold text-left px-4">${item.nama}</td>
+                            <td class="py-2 border text-left px-4">${item.prodi}</td>
+                            <td class="py-2 border">${item.hp}</td>
+                            <td class="py-2 border">
+                                <button onclick="hapusData(${item.id})" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            }
+        }
+
+        function hapusData(id) {
+            if(confirm('Yakin ingin menghapus data ini?')) {
+                let database = JSON.parse(localStorage.getItem('db_wisuda')) || [];
+                // Filter data selain ID yang dihapus
+                database = database.filter(item => item.id !== id);
+                localStorage.setItem('db_wisuda', JSON.stringify(database));
+                renderAdminTable(); // Refresh tabel
+            }
+        }
+
+        // Inisialisasi awal
+        showPage('inputSection');
     </script>
 </body>
 </html>
