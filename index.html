@@ -222,18 +222,17 @@
         }
 
         // =========================================================================
-        // --- 1. CONFIG FIREBASE (WAJIB DIGANTI!!) ---
+        // --- 1. CONFIG FIREBASE (SUDAH DIPERBAIKI OTOMATIS) ---
         // =========================================================================
         
         const firebaseConfig = {
-            apiKey: "AIzaSyC9FbDnb2qRSBOOrp-iVdCk5yQDHr9QAKw", // <-- PASTE KODE ANDA
+            apiKey: "AIzaSyC9FbDnb2qRSBOOrp-iVdCk5yQDHr9QAKw",
             authDomain: "wisudafkip-9bf28.firebaseapp.com",
             databaseURL: "https://wisudafkip-9bf28-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "wisudafkip-9bf28",
-            storageBucket: "wisudafkip-9bf28.appspot.com", // <-- WAJIB ADA UNTUK UPLOAD FILE
+            storageBucket: "wisudafkip-9bf28.appspot.com",
             messagingSenderId: "528206555265",
-            appId: "1:528206555265:web:0e0df4d93fd0db58e68580"
-            measurementId: "G-NW845QP4VR"
+            appId: "1:528206555265:web:0e0df4d93fd0db58e68580", // <--- Koma sudah ditambahkan
         };
 
         // =========================================================================
@@ -241,14 +240,10 @@
         let db, storage;
         
         try {
-            if (firebaseConfig.apiKey.includes("MASUKKAN_API_KEY")) {
-                console.warn("⚠️ Config Firebase belum diisi.");
-            } else {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                storage = firebase.storage();
-                console.log("✅ Firebase & Storage Terhubung");
-            }
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            storage = firebase.storage();
+            console.log("✅ Firebase & Storage Terhubung");
         } catch (e) {
             alert("Error Config: " + e.message);
         }
@@ -433,6 +428,3 @@
     </script>
 </body>
 </html>
-
-
-
