@@ -189,12 +189,23 @@
         // URL GOOGLE SHEET (SPREADSHEET HASIL)
         // Ganti dengan URL Spreadsheet Anda yang sebenarnya
         const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvnpl-W4pixjFyVXoQ2dFSy6_ZelkdTDKvjhr3wPo_TWKOUHzzk0e-bksKlDXL4cYltBw8vRs6VVeJ/pubhtml?gid=0&single=true";
+        
+        // URL TAMPILAN WEB HASIL (OPSIONAL)
+        const WEB_RESULT_URL = ""; 
         // ==========================================================
 
         function checkLogin() {
             const pass = prompt("Masukkan Password Admin:");
             if (pass === "admin123") {
-                window.open(SPREADSHEET_URL, "_blank");
+                if (WEB_RESULT_URL) {
+                     if(confirm("Password Benar!\n\nKlik OK untuk membuka Tampilan Web Hasil.\nKlik Cancel untuk membuka Spreadsheet.")) {
+                         window.open(WEB_RESULT_URL, "_blank");
+                     } else {
+                         window.open(SPREADSHEET_URL, "_blank");
+                     }
+                } else {
+                    window.open(SPREADSHEET_URL, "_blank");
+                }
             } else if (pass !== null) {
                 alert("Password Salah! Akses Ditolak.");
             }
@@ -249,7 +260,7 @@
                             const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
                             resolve(compressedDataUrl); // Mengembalikan Base64 yang sudah dikompres
                         } else {
-                            // Jika PDF, kembalikan aslinya (Base64)
+                            // Jika PDF atau bukan gambar, kembalikan aslinya (Base64)
                             resolve(event.target.result);
                         }
                     };
@@ -298,21 +309,21 @@
 
                 document.getElementById('loadingMsg').innerText = "Mengirim data ke Google Drive... (Mohon tunggu)";
 
-                const response = await fetch(SCRIPT_URL, {
+                // Menggunakan fetch dengan mode 'no-cors' agar browser tidak memblokir (CORS bypass)
+                // Konsekuensinya: kita tidak bisa membaca response.json(), jadi kita asumsikan sukses jika fetch selesai.
+                await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                const result = await response.json();
-                
-                if (result.status === "success") {
-                    showPreview(payload);
-                    alert("ALHAMDULILLAH! \nData dan Berkas Anda Berhasil Disimpan.");
-                } else {
-                    throw new Error(result.message);
-                }
+                // Karena no-cors, kita langsung tampilkan sukses
+                showPreview(payload);
+                alert("ALHAMDULILLAH! \nData dan Berkas Anda Berhasil Dikirim ke Server.");
+
             } catch (err) {
-                alert("Gagal Mengirim Data: " + err.message + "\n\nSaran: Coba kurangi ukuran file PDF Anda jika masih gagal.");
+                alert("Gagal Mengirim Data: " + err.message + "\n\nSaran: Coba gunakan foto dengan ukuran lebih kecil atau file PDF ringan.");
                 document.getElementById('btnSubmit').classList.remove('hidden');
                 document.getElementById('loading').classList.add('hidden');
             }
