@@ -135,23 +135,23 @@
                 <div class="space-y-4 text-sm text-gray-700">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">1) Fotokopi Ijazah Terakhir (Legalisir)</span>
-                        <input type="file" id="file_ijazah" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_ijazah" accept=".pdf,.jpg,.jpeg,.png" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">2) Fotokopi KTP</span>
-                        <input type="file" id="file_ktp" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_ktp" accept=".pdf,.jpg,.jpeg,.png" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">3) Surat Bebas Biaya Pendidikan</span>
-                        <input type="file" id="file_bebas" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_bebas" accept=".pdf,.jpg,.jpeg,.png" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">4) Sertifikat PKKMB</span>
-                        <input type="file" id="file_pkkmb" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_pkkmb" accept=".pdf,.jpg,.jpeg,.png" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                 </div>
                 <p class="text-[10px] text-red-500 mt-2 italic flex items-center gap-1">
-                    <i class="fas fa-info-circle"></i> Gunakan file PDF atau JPG/PNG. Maksimal ukuran per file disarankan < 5MB.
+                    <i class="fas fa-info-circle"></i> Gunakan file PDF atau JPG/PNG. Sistem akan otomatis mengompres gambar.
                 </p>
             </div>
 
@@ -185,18 +185,16 @@
         // URL WEB APP GOOGLE APPS SCRIPT ANDA
         // ==========================================================
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVcIAykOfc3uWIeO-yrKelzhrUGFmvDkCrgTEr2cWyLd752mzTdHkc4-KnSy6IjgR6kg/exec";
+        
+        // URL GOOGLE SHEET (SPREADSHEET HASIL)
+        // Ganti dengan URL Spreadsheet Anda yang sebenarnya
+        const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvnpl-W4pixjFyVXoQ2dFSy6_ZelkdTDKvjhr3wPo_TWKOUHzzk0e-bksKlDXL4cYltBw8vRs6VVeJ/pubhtml?gid=0&single=true";
         // ==========================================================
 
         function checkLogin() {
             const pass = prompt("Masukkan Password Admin:");
             if (pass === "admin123") {
-                // Arahkan ke Google Sheet (Silakan ganti URL ini dengan URL Google Sheet Anda jika mau)
-                // Atau biarkan kosong ("#") jika hanya ingin memberi tahu.
-                const sheetURL = "https://docs.google.com/spreadsheets/d/1j2Q9vb0qcc6yJjx9YJZRmGQr83PZxDRIwA91aNUoens/edit?usp=sharing"; 
-                
-                if(confirm("Password Benar! \n\nKlik OK untuk membuka Google Sheet Data Pendaftar.\n(Pastikan Anda sudah login akun Google yang memiliki akses)")) {
-                    window.open(sheetURL, "_blank");
-                }
+                window.open(SPREADSHEET_URL, "_blank");
             } else if (pass !== null) {
                 alert("Password Salah! Akses Ditolak.");
             }
@@ -205,25 +203,72 @@
         async function handleSimpan(e) {
             e.preventDefault();
             
+            if (SCRIPT_URL.includes("MASUKKAN_URL")) {
+                alert("Eror: Anda belum memasukkan SCRIPT_URL!");
+                return;
+            }
+
             document.getElementById('btnSubmit').classList.add('hidden');
             document.getElementById('loading').classList.remove('hidden');
 
-            // Helper function konversi file ke Base64
-            const toBase64 = file => new Promise((resolve, reject) => {
-                if (!file) resolve("");
+            // --- FUNGSI KOMPRESI GAMBAR & FILE HANDLING ---
+            const processFile = (file) => new Promise((resolve, reject) => {
+                if (!file) {
+                    resolve("");
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
+                
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+
+                    img.onload = () => {
+                        // Jika file adalah gambar, lakukan resize/kompresi
+                        if (file.type.startsWith('image/')) {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            // Hitung ukuran baru (Max lebar 1200px)
+                            const MAX_WIDTH = 1200;
+                            let width = img.width;
+                            let height = img.height;
+
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            // Kompres jadi JPEG kualitas 0.7 (70%)
+                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                            resolve(compressedDataUrl); // Mengembalikan Base64 yang sudah dikompres
+                        } else {
+                            // Jika PDF, kembalikan aslinya (Base64)
+                            resolve(event.target.result);
+                        }
+                    };
+
+                    img.onerror = () => {
+                        // Jika gagal load sebagai image (misal PDF), kembalikan raw data
+                        resolve(event.target.result);
+                    };
+                };
                 reader.onerror = error => reject(error);
             });
 
             try {
-                document.getElementById('loadingMsg').innerText = "Sedang mengonversi berkas...";
+                document.getElementById('loadingMsg').innerText = "Mengompresi berkas...";
                 
-                const ijazahB64 = await toBase64(document.getElementById('file_ijazah').files[0]);
-                const ktpB64 = await toBase64(document.getElementById('file_ktp').files[0]);
-                const bebasB64 = await toBase64(document.getElementById('file_bebas').files[0]);
-                const pkkmbB64 = await toBase64(document.getElementById('file_pkkmb').files[0]);
+                const ijazahB64 = await processFile(document.getElementById('file_ijazah').files[0]);
+                const ktpB64 = await processFile(document.getElementById('file_ktp').files[0]);
+                const bebasB64 = await processFile(document.getElementById('file_bebas').files[0]);
+                const pkkmbB64 = await processFile(document.getElementById('file_pkkmb').files[0]);
 
                 const payload = {
                     gelombang: document.getElementById('input_gelombang').value,
@@ -253,8 +298,6 @@
 
                 document.getElementById('loadingMsg').innerText = "Mengirim data ke Google Drive... (Mohon tunggu)";
 
-                // Menggunakan 'no-cors' mode mungkin diperlukan jika ada masalah CORS, 
-                // tapi biasanya POST ke Web App Exec URL standar bekerja.
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(payload)
@@ -269,7 +312,7 @@
                     throw new Error(result.message);
                 }
             } catch (err) {
-                alert("Gagal Mengirim Data: " + err.message + "\n\nCoba kurangi ukuran file lampiran atau periksa koneksi internet.");
+                alert("Gagal Mengirim Data: " + err.message + "\n\nSaran: Coba kurangi ukuran file PDF Anda jika masih gagal.");
                 document.getElementById('btnSubmit').classList.remove('hidden');
                 document.getElementById('loading').classList.add('hidden');
             }
@@ -311,4 +354,3 @@
     </script>
 </body>
 </html>
-
