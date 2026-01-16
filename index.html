@@ -22,31 +22,32 @@
 </head>
 <body class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 min-h-screen text-gray-800 py-10 px-4">
 
-    <!-- NAVBAR UPDATE -->
+    <!-- NAVBAR (Tombol di Kanan) -->
     <nav class="bg-blue-900 text-white p-4 shadow-lg no-print fixed top-0 w-full z-50">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <!-- Logo / Judul Kiri -->
             <div class="font-bold text-lg flex items-center gap-2">
                 <i class="fas fa-graduation-cap text-yellow-400"></i> SIP-WISUDA FKIP
             </div>
-            <div class="space-x-4">
-                <!-- Tombol Daftar (Untuk Umum) -->
-                <button onclick="showPage('inputSection')" class="hover:text-yellow-400 transition font-medium">
-                    <i class="fas fa-edit mr-1"></i> Daftar
+            
+            <!-- Menu Kanan -->
+            <div class="flex items-center space-x-4">
+                <button onclick="showPage('inputSection')" class="hover:text-yellow-400 transition font-medium flex items-center gap-1">
+                    <i class="fas fa-edit"></i> Daftar
                 </button>
                 
-                <!-- Tombol Admin (Terproteksi) -->
-                <button onclick="checkLogin()" class="bg-yellow-500 text-blue-900 px-4 py-1 rounded font-bold hover:bg-yellow-400 transition cursor-pointer shadow-md border-2 border-yellow-600 text-sm ml-4">
-                    <i class="fas fa-user-shield mr-1"></i> Admin
+                <button onclick="checkLogin()" class="bg-yellow-500 text-blue-900 px-4 py-1 rounded font-bold hover:bg-yellow-400 transition cursor-pointer shadow-md border-2 border-yellow-600 text-sm flex items-center gap-1">
+                    <i class="fas fa-user-shield"></i> Admin
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Spacer agar konten tidak tertutup navbar -->
+    <!-- Spacer -->
     <div class="h-16 no-print"></div>
 
-    <!-- FORM INPUT -->
-    <div id="inputSection" class="max-w-4xl mx-auto glass-card rounded-2xl shadow-2xl overflow-hidden bg-white mt-4">
+    <!-- HALAMAN 1: FORM INPUT -->
+    <div id="inputSection" class="max-w-4xl mx-auto glass-card rounded-2xl shadow-2xl overflow-hidden bg-white mt-4 transition-all duration-500">
         <div class="bg-blue-900 p-8 text-white text-center border-b-4 border-yellow-400">
             <h1 class="text-2xl font-bold uppercase tracking-wider mb-1">Formulir Pendaftaran Wisuda</h1>
             <h2 class="text-xl font-bold uppercase tracking-wide mb-1 text-yellow-400">Fakultas Keguruan dan Ilmu Pendidikan</h2>
@@ -58,14 +59,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-5 rounded-xl border border-blue-100">
                 <div>
                     <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Gelombang Wisuda</label>
-                    <select id="input_gelombang" class="w-full border p-2 rounded bg-white" required>
+                    <select id="input_gelombang" class="w-full border p-2 rounded bg-white outline-none focus:ring-2 focus:ring-blue-500" required>
                         <option value="I">Gelombang I</option>
                         <option value="II" selected>Gelombang II</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Tahun Akademik</label>
-                    <select id="input_tahun" class="w-full border p-2 rounded bg-white" required>
+                    <select id="input_tahun" class="w-full border p-2 rounded bg-white outline-none focus:ring-2 focus:ring-blue-500" required>
                         <option>2025</option>
                         <option>2026</option>
                         <option>2027</option>
@@ -84,7 +85,7 @@
                     <div><label class="text-xs font-bold text-gray-500 uppercase">NPM</label><input type="text" id="input_npm" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
                     <div>
                         <label class="text-xs font-bold text-gray-500 uppercase">Program Studi</label>
-                        <select id="input_prodi" class="w-full border p-2 rounded mt-1 bg-gray-50" required>
+                        <select id="input_prodi" class="w-full border p-2 rounded mt-1 bg-gray-50 focus:bg-white" required>
                             <option>Pendidikan Bahasa dan Sastra Indonesia</option>
                             <option>Pendidikan Bahasa Inggris</option>
                             <option>Pendidikan Matematika</option>
@@ -122,70 +123,74 @@
             <div><label class="text-xs font-bold text-gray-500 uppercase">Alamat Rumah Lengkap</label><textarea id="input_alamat" class="w-full border-b py-2 focus:border-blue-600 outline-none h-16 resize-none" required></textarea></div>
 
             <!-- Lampiran Upload -->
-            <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6">
+            <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6 hover:bg-gray-100 transition">
                 <h3 class="font-bold text-gray-800 mb-4 text-sm uppercase flex items-center gap-2">
                     <i class="fas fa-paperclip text-blue-900"></i> Unggah Persyaratan Lampiran:
                 </h3>
                 <div class="space-y-4 text-sm text-gray-700">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
-                        <span>1) Fotokopi Ijazah Terakhir (Legalisir)</span>
-                        <input type="file" id="file_ijazah" class="text-xs">
+                        <span class="font-medium">1) Fotokopi Ijazah Terakhir (Legalisir)</span>
+                        <input type="file" id="file_ijazah" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
-                        <span>2) Fotokopi KTP</span>
-                        <input type="file" id="file_ktp" class="text-xs">
+                        <span class="font-medium">2) Fotokopi KTP</span>
+                        <input type="file" id="file_ktp" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
-                        <span>3) Surat Bebas Biaya Pendidikan</span>
-                        <input type="file" id="file_bebas" class="text-xs">
+                        <span class="font-medium">3) Surat Bebas Biaya Pendidikan</span>
+                        <input type="file" id="file_bebas" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
-                        <span>4) Sertifikat PKKMB</span>
-                        <input type="file" id="file_pkkmb" class="text-xs">
+                        <span class="font-medium">4) Sertifikat PKKMB</span>
+                        <input type="file" id="file_pkkmb" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                     </div>
                 </div>
-                <p class="text-[10px] text-red-500 mt-2 italic">* Mohon gunakan file berformat Gambar (JPG/PNG) atau PDF.</p>
+                <p class="text-[10px] text-red-500 mt-2 italic flex items-center gap-1">
+                    <i class="fas fa-info-circle"></i> Gunakan file PDF atau JPG/PNG. Maksimal ukuran per file disarankan < 5MB.
+                </p>
             </div>
 
             <div class="pt-6 flex flex-col items-center">
-                <div id="loading" class="hidden mb-3 text-blue-900 font-bold flex items-center gap-2">
+                <div id="loading" class="hidden mb-3 text-blue-900 font-bold flex items-center gap-2 bg-blue-100 px-4 py-2 rounded-lg">
                     <div class="loader"></div> <span id="loadingMsg">Sedang memproses data...</span>
                 </div>
-                <button type="submit" id="btnSubmit" class="bg-blue-900 text-white px-12 py-4 rounded-full font-bold hover:bg-blue-800 shadow-lg uppercase tracking-widest text-sm transition transform hover:-translate-y-1">
-                    <i class="fas fa-cloud-upload-alt mr-2"></i> Kirim Pendaftaran
+                <button type="submit" id="btnSubmit" class="bg-blue-900 text-white px-12 py-4 rounded-full font-bold hover:bg-blue-800 shadow-lg uppercase tracking-widest text-sm transition transform hover:-translate-y-1 w-full md:w-auto">
+                    <i class="fas fa-paper-plane mr-2"></i> Kirim Pendaftaran
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- PREVIEW SETELAH BERHASIL -->
+    <!-- HALAMAN 2: PREVIEW SETELAH BERHASIL -->
     <div id="previewSection" class="hidden max-w-4xl mx-auto bg-white p-12 shadow-2xl min-h-screen relative rounded-xl mt-4">
         <div class="text-center border-b-2 border-black pb-4 mb-8">
             <h1 class="text-xl font-bold uppercase">Tanda Terima Pendaftaran</h1>
             <h2 class="text-lg font-bold uppercase text-blue-900">FKIP Universitas Wiralodra</h2>
-            <p class="text-sm">Data & Berkas Berhasil Disimpan di Google Drive</p>
+            <p class="text-sm mt-2">Data & Berkas Berhasil Disimpan di Google Drive</p>
         </div>
         <div id="previewContent"></div>
-        <div class="mt-10 flex gap-4 justify-center no-print">
-            <button onclick="window.print()" class="bg-blue-900 text-white px-8 py-2 rounded-lg font-bold"><i class="fas fa-print mr-2"></i> Cetak Bukti</button>
-            <button onclick="window.location.reload()" class="bg-green-600 text-white px-8 py-2 rounded-lg font-bold">Formulir Baru</button>
+        <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center no-print">
+            <button onclick="window.print()" class="bg-blue-900 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-blue-800 transition"><i class="fas fa-print mr-2"></i> Cetak Bukti</button>
+            <button onclick="window.location.reload()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i> Daftar Baru</button>
         </div>
     </div>
 
     <script>
         // ==========================================================
-        // ⚠️ GANTI URL DI BAWAH INI DENGAN WEB APP URL ANDA ⚠️
+        // URL WEB APP GOOGLE APPS SCRIPT ANDA
         // ==========================================================
-        const SCRIPT_URL = "MASUKKAN_URL_WEB_APP_ANDA_DISINI";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVcIAykOfc3uWIeO-yrKelzhrUGFmvDkCrgTEr2cWyLd752mzTdHkc4-KnSy6IjgR6kg/exec";
         // ==========================================================
 
         function checkLogin() {
-            const pass = prompt("Masukkan Password Admin (Hanya untuk Admin):");
+            const pass = prompt("Masukkan Password Admin:");
             if (pass === "admin123") {
-                // Di sistem Google Drive, admin cukup buka Google Sheet/Drive
-                // Jadi kita arahkan ke link Google Sheet (Anda bisa ganti link ini)
-                if(confirm("Password Benar! Anda akan diarahkan ke Google Sheet Data Pendaftar. Lanjutkan?")) {
-                    window.open("https://docs.google.com/spreadsheets/", "_blank");
+                // Arahkan ke Google Sheet (Silakan ganti URL ini dengan URL Google Sheet Anda jika mau)
+                // Atau biarkan kosong ("#") jika hanya ingin memberi tahu.
+                const sheetURL = "https://docs.google.com/spreadsheets/"; 
+                
+                if(confirm("Password Benar! \n\nKlik OK untuk membuka Google Sheet Data Pendaftar.\n(Pastikan Anda sudah login akun Google yang memiliki akses)")) {
+                    window.open(sheetURL, "_blank");
                 }
             } else if (pass !== null) {
                 alert("Password Salah! Akses Ditolak.");
@@ -195,14 +200,10 @@
         async function handleSimpan(e) {
             e.preventDefault();
             
-            if (SCRIPT_URL.includes("MASUKKAN_URL")) {
-                alert("Eror: Anda belum memasukkan SCRIPT_URL!");
-                return;
-            }
-
             document.getElementById('btnSubmit').classList.add('hidden');
             document.getElementById('loading').classList.remove('hidden');
 
+            // Helper function konversi file ke Base64
             const toBase64 = file => new Promise((resolve, reject) => {
                 if (!file) resolve("");
                 const reader = new FileReader();
@@ -245,22 +246,25 @@
                     }
                 };
 
-                document.getElementById('loadingMsg').innerText = "Mengirim data ke Google Drive... (Mungkin butuh 20-30 detik)";
+                document.getElementById('loadingMsg').innerText = "Mengirim data ke Google Drive... (Mohon tunggu)";
 
+                // Menggunakan 'no-cors' mode mungkin diperlukan jika ada masalah CORS, 
+                // tapi biasanya POST ke Web App Exec URL standar bekerja.
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
 
                 const result = await response.json();
+                
                 if (result.status === "success") {
                     showPreview(payload);
-                    alert("Pendaftaran Berhasil disimpan!");
+                    alert("ALHAMDULILLAH! \nData dan Berkas Anda Berhasil Disimpan.");
                 } else {
                     throw new Error(result.message);
                 }
             } catch (err) {
-                alert("Gagal: " + err.message);
+                alert("Gagal Mengirim Data: " + err.message + "\n\nCoba kurangi ukuran file lampiran atau periksa koneksi internet.");
                 document.getElementById('btnSubmit').classList.remove('hidden');
                 document.getElementById('loading').classList.add('hidden');
             }
@@ -271,17 +275,23 @@
             document.getElementById('previewSection').classList.remove('hidden');
             
             let html = `
-                <div class="space-y-2 text-sm leading-relaxed">
-                    <p><b>Nama Lengkap:</b> ${data.nama}</p>
-                    <p><b>NPM:</b> ${data.npm}</p>
-                    <p><b>Program Studi:</b> ${data.prodi}</p>
-                    <p><b>NIK:</b> ${data.nik}</p>
-                    <p><b>No. HP:</b> ${data.hp}</p>
-                    <p><b>IPK:</b> ${data.ipk}</p>
-                    <p><b>Waktu Pendaftaran:</b> ${new Date().toLocaleString('id-ID')}</p>
-                </div>
-                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-xs italic">
-                    * Berkas pendaftaran telah diunggah ke folder Google Drive Fakultas. Mohon simpan bukti pendaftaran ini.
+                <table class="w-full text-sm leading-8 mt-5 border-collapse">
+                    <tr class="border-b"><td class="w-1/3 font-bold py-1">Nama Lengkap</td><td>: <span class="uppercase">${data.nama}</span></td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">NPM</td><td>: ${data.npm}</td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">Program Studi</td><td>: ${data.prodi}</td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">Kelas / Jenjang</td><td>: ${data.kelas} / ${data.jenjang}</td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">TTL</td><td>: ${data.ttl}</td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">NIK</td><td>: ${data.nik}</td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">Kontak</td><td>: ${data.hp} / ${data.email}</td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">Tgl Lulus</td><td>: ${data.tgl_lulus} (IPK: ${data.ipk})</td></tr>
+                    <tr class="border-b"><td class="font-bold py-1">Waktu Daftar</td><td>: ${new Date().toLocaleString('id-ID')}</td></tr>
+                </table>
+                <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm flex items-start gap-3">
+                    <i class="fas fa-check-circle text-xl mt-1"></i>
+                    <div>
+                        <strong>Pendaftaran Berhasil!</strong><br>
+                        Data telah tercatat di sistem akademik. Berkas lampiran (Ijazah, KTP, dll) telah aman tersimpan di Google Drive Fakultas.
+                    </div>
                 </div>
             `;
             document.getElementById('previewContent').innerHTML = html;
@@ -291,6 +301,7 @@
         function showPage(id) { 
             document.getElementById('inputSection').classList.remove('hidden');
             document.getElementById('previewSection').classList.add('hidden');
+            window.scrollTo(0,0);
         }
     </script>
 </body>
