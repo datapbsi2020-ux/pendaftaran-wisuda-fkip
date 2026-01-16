@@ -8,9 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- FIREBASE SDK -->
+    <!-- FIREBASE SDK (Database + Storage) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -38,7 +39,6 @@
             </div>
             <div class="space-x-4">
                 <button onclick="showPage('inputSection')" class="hover:text-yellow-400 transition"><i class="fas fa-edit"></i> Daftar</button>
-                <!-- TOMBOL ADMIN -->
                 <button onclick="checkLogin()" class="bg-yellow-500 text-blue-900 px-4 py-1 rounded font-bold hover:bg-yellow-400 transition cursor-pointer shadow-md border-2 border-yellow-600">
                     <i class="fas fa-user-shield"></i> Admin Panel
                 </button>
@@ -98,10 +98,10 @@
                     </div>
                 </div>
 
-                <!-- LAMPIRAN -->
+                <!-- LAMPIRAN (UPLOAD) -->
                 <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6">
                     <h3 class="font-bold text-gray-800 mb-4 text-sm uppercase flex items-center gap-2">
-                        <i class="fas fa-paperclip text-blue-900"></i> Persyaratan Lampiran:
+                        <i class="fas fa-paperclip text-blue-900"></i> Persyaratan Lampiran (Upload File):
                     </h3>
                     <div class="space-y-4 text-sm text-gray-700">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
@@ -121,10 +121,11 @@
                             <input type="file" id="file_pkkmb" class="text-xs">
                         </div>
                     </div>
+                    <p class="text-xs text-red-500 mt-2">* Mohon tunggu proses upload selesai saat menekan tombol Simpan.</p>
                 </div>
 
                 <div class="pt-6 flex flex-col items-center">
-                    <div id="loadingSimpan" class="hidden mb-2 text-blue-900 font-bold"><div class="loader mr-2"></div>Menghubungkan Database...</div>
+                    <div id="loadingSimpan" class="hidden mb-2 text-blue-900 font-bold"><div class="loader mr-2"></div><span id="loadingText">Sedang Mengupload Berkas...</span></div>
                     <button type="submit" id="btnSimpan" class="bg-blue-900 text-white px-12 py-3 rounded-full font-bold hover:bg-blue-800 shadow-lg uppercase tracking-widest text-sm transition transform hover:-translate-y-1 cursor-pointer">
                         <i class="fas fa-cloud-upload-alt mr-2"></i> Simpan Permanen & Preview
                     </button>
@@ -155,7 +156,7 @@
             </table>
             
             <div class="mt-8 border border-black p-4">
-                <p class="font-bold mb-2 text-sm uppercase">Status Dokumen Lampiran:</p>
+                <p class="font-bold mb-2 text-sm uppercase">Status Upload Berkas:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 text-sm gap-2">
                     <div class="flex items-center gap-2">
                         <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_ijazah"></div> <span>Ijazah Legalisir</span>
@@ -186,10 +187,10 @@
             </div>
         </div>
 
-        <!-- HALAMAN 3: ADMIN PANEL (Realtime) -->
-        <div id="adminSection" class="hidden max-w-6xl mx-auto glass-card rounded-2xl shadow-2xl p-8 bg-white mt-4">
+        <!-- HALAMAN 3: ADMIN PANEL (Realtime + Download Link) -->
+        <div id="adminSection" class="hidden max-w-7xl mx-auto glass-card rounded-2xl shadow-2xl p-8 bg-white mt-4">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-server"></i> Database Pendaftar (Admin Only)</h2>
+                <h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-server"></i> Database Pendaftar & Berkas</h2>
                 <button onclick="logoutAdmin()" class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700">Logout</button>
             </div>
             <div class="overflow-x-auto">
@@ -200,7 +201,7 @@
                             <th class="py-2 px-4 border">NPM</th>
                             <th class="py-2 px-4 border">Nama Lengkap</th>
                             <th class="py-2 px-4 border">Prodi</th>
-                            <th class="py-2 px-4 border">Berkas</th>
+                            <th class="py-2 px-4 border">Download Berkas</th>
                             <th class="py-2 px-4 border">Aksi</th>
                         </tr>
                     </thead>
@@ -214,137 +215,132 @@
 
     <!-- SCRIPT UTAMA -->
     <script>
-        // --- NAVIGASI (Diletakkan di atas agar tetap jalan walau Firebase Error) ---
         function showPage(pageId) {
             document.querySelectorAll('#inputSection, #previewSection, #adminSection').forEach(el => el.classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
             window.scrollTo(0,0);
         }
 
-        function checkLogin() {
-            // Cek apakah script Firebase crash atau tidak
-            if (typeof firebaseConfig === 'undefined') {
-                alert("CRITICAL ERROR: Syntax Config Salah!\n\nSepertinya Anda salah copy-paste kode Firebase (ada kurung kurawal atau tanda petik yang hilang). \nSilakan cek ulang kode di file index.html.");
-                return;
-            }
-
-            const pass = prompt("Masukkan Password Admin:");
-            if (pass === "admin123") {
-                showPage('adminSection');
-                // Coba load data, jika DB error, tabel akan tetap kosong tapi halaman terbuka
-                try {
-                    loadRealtimeData();
-                } catch(e) {
-                    console.log("DB Error: " + e);
-                    document.getElementById('adminTableBody').innerHTML = '<tr><td colspan="6" class="py-8 text-red-500 font-bold">Gagal terhubung ke Database. Cek Config Anda.</td></tr>';
-                }
-            } else if (pass !== null) {
-                alert("Password Salah!");
-            }
-        }
-
-        function logoutAdmin() { showPage('inputSection'); }
-
         // =========================================================================
-        // --- AREA CONFIG FIREBASE (KODE YANG SUDAH DIPERBAIKI) ---
+        // --- 1. CONFIG FIREBASE (WAJIB DIGANTI!!) ---
         // =========================================================================
         
         const firebaseConfig = {
-            apiKey: "AIzaSyC9FbDnb2qRSBOOrp-iVdCk5yQDHr9QAKw",
-            authDomain: "wisudafkip-9bf28.firebaseapp.com",
-            databaseURL: "https://wisudafkip-9bf28-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "wisudafkip-9bf28",
-            storageBucket: "wisudafkip-9bf28.firebasestorage.app",
-            messagingSenderId: "528206555265",
-            appId: "1:528206555265:web:0e0df4d93fd0db58e68580", // <-- KOMA SUDAH DITAMBAHKAN
-            measurementId: "G-NW845QP4VR"
+            apiKey: "MASUKKAN_API_KEY_ANDA_DISINI", // <-- PASTE KODE ANDA
+            authDomain: "xxxx.firebaseapp.com",
+            databaseURL: "https://xxxx.firebaseio.com",
+            projectId: "xxxx",
+            storageBucket: "xxxx.appspot.com", // <-- WAJIB ADA UNTUK UPLOAD FILE
+            messagingSenderId: "xxxx",
+            appId: "xxxx"
         };
 
         // =========================================================================
 
-        let db;
+        let db, storage;
         
-        // Coba inisialisasi Firebase dengan Error Handling yang kuat
         try {
             if (firebaseConfig.apiKey.includes("MASUKKAN_API_KEY")) {
-                console.warn("⚠️ PERINGATAN: Config Firebase belum diisi.");
+                console.warn("⚠️ Config Firebase belum diisi.");
             } else {
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.database();
-                console.log("✅ Firebase Berhasil Terhubung");
+                storage = firebase.storage();
+                console.log("✅ Firebase & Storage Terhubung");
             }
         } catch (e) {
-            console.error("🔥 FIREBASE CRASH: " + e.message);
-            alert("Terjadi kesalahan pada Kode Config Firebase Anda:\n\n" + e.message + "\n\nMohon periksa tanda petik atau kurung kurawal.");
+            alert("Error Config: " + e.message);
         }
 
-        // --- FUNGSI SIMPAN ---
-        function handleSimpan(e) {
+        // FUNGSI UPLOAD KE STORAGE
+        async function uploadFile(fileInputId, npm, folderName) {
+            const file = document.getElementById(fileInputId).files[0];
+            if (!file) return ""; // Jika tidak ada file
+
+            // Buat nama file unik: uploads/NPM/nama_file
+            const storageRef = storage.ref(`uploads/${npm}/${folderName}_${file.name}`);
+            
+            // Upload
+            await storageRef.put(file);
+            
+            // Ambil URL Download
+            const url = await storageRef.getDownloadURL();
+            return url;
+        }
+
+        // --- FUNGSI SIMPAN (ASYNC UNTUK UPLOAD) ---
+        async function handleSimpan(e) {
             e.preventDefault();
 
-            if (!db) {
-                alert("⛔ DATABASE BELUM TERHUBUNG!\n\nAnda belum mengganti kode 'firebaseConfig' dengan benar.\nSilakan edit file index.html lalu masukkan API Key dari Firebase Console.");
+            if (!db || !storage) {
+                alert("⛔ DATABASE/STORAGE BELUM TERHUBUNG!\nCek Config Firebase Anda. Pastikan Storage Bucket ada.");
                 return;
             }
 
             document.getElementById('btnSimpan').classList.add('hidden');
             document.getElementById('loadingSimpan').classList.remove('hidden');
-
-            const hasIjazah = document.getElementById('file_ijazah').files.length > 0;
-            const hasKtp = document.getElementById('file_ktp').files.length > 0;
-            const hasBebas = document.getElementById('file_bebas').files.length > 0;
-            const hasPkkmb = document.getElementById('file_pkkmb').files.length > 0;
-
+            
+            const npm = document.getElementById('input_npm').value;
             const id = Date.now(); 
-            const formData = {
-                id: id,
-                tgl_input: new Date().toLocaleString('id-ID'),
-                gelombang: document.getElementById('input_gelombang').value,
-                tahun: document.getElementById('input_tahun').value,
-                nama: document.getElementById('input_nama').value,
-                npm: document.getElementById('input_npm').value,
-                prodi: document.getElementById('input_prodi').value,
-                kelas: document.getElementById('input_kelas').value,
-                jenjang: document.getElementById('input_jenjang').value,
-                ttl: document.getElementById('input_ttl').value,
-                jk: document.querySelector('input[name="jk"]:checked').value,
-                nik: document.getElementById('input_nik').value,
-                ibu: document.getElementById('input_ibu').value,
-                email: document.getElementById('input_email').value,
-                hp: document.getElementById('input_hp').value,
-                tgl_lulus: document.getElementById('input_tgl_lulus').value,
-                ipk: document.getElementById('input_ipk').value,
-                yudisium: document.getElementById('input_yudisium').value,
-                alamat: document.getElementById('input_alamat').value,
-                lampiran: {
-                    ijazah: hasIjazah,
-                    ktp: hasKtp,
-                    bebas: hasBebas,
-                    pkkmb: hasPkkmb
-                }
-            };
 
-            const timeout = setTimeout(() => {
-                alert("Waktu habis! Koneksi lambat atau Database Terkunci.\nPastikan RULES Firebase sudah diset TRUE.");
-                document.getElementById('btnSimpan').classList.remove('hidden');
-                document.getElementById('loadingSimpan').classList.add('hidden');
-            }, 10000);
+            try {
+                // 1. Upload File Dulu (Satu per satu)
+                document.getElementById('loadingText').innerText = "Mengupload Ijazah...";
+                const urlIjazah = await uploadFile('file_ijazah', npm, 'ijazah');
 
-            db.ref('pendaftar/' + id).set(formData)
-            .then(() => {
-                clearTimeout(timeout);
+                document.getElementById('loadingText').innerText = "Mengupload KTP...";
+                const urlKtp = await uploadFile('file_ktp', npm, 'ktp');
+
+                document.getElementById('loadingText').innerText = "Mengupload Surat Bebas...";
+                const urlBebas = await uploadFile('file_bebas', npm, 'bebas');
+
+                document.getElementById('loadingText').innerText = "Mengupload PKKMB...";
+                const urlPkkmb = await uploadFile('file_pkkmb', npm, 'pkkmb');
+
+                document.getElementById('loadingText').innerText = "Menyimpan Data...";
+
+                // 2. Simpan Data Teks + Link File ke Database
+                const formData = {
+                    id: id,
+                    tgl_input: new Date().toLocaleString('id-ID'),
+                    gelombang: document.getElementById('input_gelombang').value,
+                    tahun: document.getElementById('input_tahun').value,
+                    nama: document.getElementById('input_nama').value,
+                    npm: npm,
+                    prodi: document.getElementById('input_prodi').value,
+                    kelas: document.getElementById('input_kelas').value,
+                    jenjang: document.getElementById('input_jenjang').value,
+                    ttl: document.getElementById('input_ttl').value,
+                    jk: document.querySelector('input[name="jk"]:checked').value,
+                    nik: document.getElementById('input_nik').value,
+                    ibu: document.getElementById('input_ibu').value,
+                    email: document.getElementById('input_email').value,
+                    hp: document.getElementById('input_hp').value,
+                    tgl_lulus: document.getElementById('input_tgl_lulus').value,
+                    ipk: document.getElementById('input_ipk').value,
+                    yudisium: document.getElementById('input_yudisium').value,
+                    alamat: document.getElementById('input_alamat').value,
+                    // Simpan Link Download, bukan cuma status true/false
+                    files: {
+                        ijazah: urlIjazah,
+                        ktp: urlKtp,
+                        bebas: urlBebas,
+                        pkkmb: urlPkkmb
+                    }
+                };
+
+                await db.ref('pendaftar/' + id).set(formData);
+
                 isiPreview(formData);
                 showPage('previewSection');
-                alert('Data Berhasil Disimpan ke Server!');
-            })
-            .catch((error) => {
-                clearTimeout(timeout);
-                alert('Gagal Simpan: ' + error.message);
+                alert('Berhasil! Data dan Berkas Tersimpan.');
+
+            } catch (error) {
+                alert("Gagal Upload/Simpan: " + error.message + "\n\nTips: Pastikan 'Rules' Storage Firebase sudah diset ke True (Test Mode).");
+            } finally {
                 document.getElementById('btnSimpan').classList.remove('hidden');
-            })
-            .finally(() => {
                 document.getElementById('loadingSimpan').classList.add('hidden');
-            });
+            }
         }
 
         function isiPreview(data) {
@@ -366,19 +362,30 @@
             document.getElementById('prev_ipk').innerText = data.ipk;
             document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
 
-            document.getElementById('check_ijazah').innerText = data.lampiran.ijazah ? "✓" : "✗";
-            document.getElementById('check_ktp').innerText = data.lampiran.ktp ? "✓" : "✗";
-            document.getElementById('check_bebas').innerText = data.lampiran.bebas ? "✓" : "✗";
-            document.getElementById('check_pkkmb').innerText = data.lampiran.pkkmb ? "✓" : "✗";
+            // Cek URL (kalau ada isinya berarti file ada)
+            document.getElementById('check_ijazah').innerText = data.files.ijazah ? "✓" : "✗";
+            document.getElementById('check_ktp').innerText = data.files.ktp ? "✓" : "✗";
+            document.getElementById('check_bebas').innerText = data.files.bebas ? "✓" : "✗";
+            document.getElementById('check_pkkmb').innerText = data.files.pkkmb ? "✓" : "✗";
         }
 
-        // --- FUNGSI LOAD DATA ADMIN ---
-        function loadRealtimeData() {
-            if (!db) {
-                document.getElementById('adminTableBody').innerHTML = '<tr><td colspan="6" class="py-8 text-gray-500">Database belum terhubung.</td></tr>';
-                return;
+        // --- ADMIN LOGIN ---
+        function checkLogin() {
+            if (typeof firebaseConfig === 'undefined') { alert("Syntax Error di Config."); return; }
+            const pass = prompt("Masukkan Password Admin:");
+            if (pass === "admin123") {
+                showPage('adminSection');
+                loadRealtimeData();
+            } else if (pass !== null) {
+                alert("Password Salah!");
             }
-            
+        }
+
+        function logoutAdmin() { showPage('inputSection'); }
+
+        // --- LOAD DATA TABLE ADMIN (DENGAN LINK DOWNLOAD) ---
+        function loadRealtimeData() {
+            if (!db) return;
             const tableBody = document.getElementById('adminTableBody');
             
             db.ref('pendaftar').on('value', (snapshot) => {
@@ -388,19 +395,21 @@
                 if (data) {
                     const dataArray = Object.values(data).reverse();
                     dataArray.forEach(item => {
-                        let berkasCount = 0;
-                        if(item.lampiran && item.lampiran.ijazah) berkasCount++;
-                        if(item.lampiran && item.lampiran.ktp) berkasCount++;
-                        if(item.lampiran && item.lampiran.bebas) berkasCount++;
-                        if(item.lampiran && item.lampiran.pkkmb) berkasCount++;
+                        // Generate Tombol Download
+                        let btnIjazah = item.files?.ijazah ? `<a href="${item.files.ijazah}" target="_blank" class="text-blue-600 hover:underline text-xs block">📄 Ijazah</a>` : '<span class="text-gray-400 text-xs">-</span>';
+                        let btnKtp = item.files?.ktp ? `<a href="${item.files.ktp}" target="_blank" class="text-blue-600 hover:underline text-xs block">📄 KTP</a>` : '';
+                        let btnBebas = item.files?.bebas ? `<a href="${item.files.bebas}" target="_blank" class="text-blue-600 hover:underline text-xs block">📄 Bebas Biaya</a>` : '';
+                        let btnPkkmb = item.files?.pkkmb ? `<a href="${item.files.pkkmb}" target="_blank" class="text-blue-600 hover:underline text-xs block">📄 PKKMB</a>` : '';
 
                         const row = `
                             <tr class="hover:bg-gray-50 border-b">
                                 <td class="py-2 px-4 border text-xs">${item.tgl_input}</td>
                                 <td class="py-2 px-4 border font-bold">${item.npm}</td>
                                 <td class="py-2 px-4 border text-left">${item.nama}</td>
-                                <td class="py-2 px-4 border text-left">${item.prodi}</td>
-                                <td class="py-2 px-4 border text-sm font-bold text-blue-800">${berkasCount}/4 File</td>
+                                <td class="py-2 px-4 border text-left text-xs">${item.prodi}</td>
+                                <td class="py-2 px-4 border text-left space-y-1">
+                                    ${btnIjazah} ${btnKtp} ${btnBebas} ${btnPkkmb}
+                                </td>
                                 <td class="py-2 px-4 border">
                                     <button onclick="hapusData(${item.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 transition"><i class="fas fa-trash"></i> Hapus</button>
                                 </td>
@@ -417,6 +426,7 @@
         function hapusData(id) {
             if(confirm("Hapus data ini permanen?")) {
                 db.ref('pendaftar/' + id).remove();
+                // Note: File di Storage tidak otomatis terhapus, harus manual di Console Firebase (Fitur lanjutan)
             }
         }
     </script>
