@@ -15,8 +15,10 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-card { background: rgba(255, 255, 255, 0.98); }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #1e3a8a; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Tampilan Khusus Cetak/Print */
+        /* CSS Print */
         @media print {
             body * { visibility: hidden; }
             #previewSection, #previewSection * { visibility: visible; }
@@ -24,9 +26,6 @@
             .no-print { display: none !important; }
             body { background: white; }
         }
-        /* Loading Spinner */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #1e3a8a; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 min-h-screen text-gray-800">
@@ -35,11 +34,14 @@
     <nav class="bg-blue-900 text-white p-4 shadow-lg no-print">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="font-bold text-lg flex items-center gap-2">
-                <i class="fas fa-graduation-cap text-yellow-400"></i> SIP-WISUDA FKIP (ONLINE)
+                <i class="fas fa-graduation-cap text-yellow-400"></i> SIP-WISUDA FKIP
             </div>
             <div class="space-x-4">
                 <button onclick="showPage('inputSection')" class="hover:text-yellow-400 transition"><i class="fas fa-edit"></i> Daftar</button>
-                <button onclick="checkLogin()" class="bg-yellow-500 text-blue-900 px-4 py-1 rounded font-bold hover:bg-yellow-400 transition"><i class="fas fa-user-shield"></i> Admin</button>
+                <!-- TOMBOL ADMIN -->
+                <button onclick="checkLogin()" class="bg-yellow-500 text-blue-900 px-4 py-1 rounded font-bold hover:bg-yellow-400 transition cursor-pointer shadow-md border-2 border-yellow-600">
+                    <i class="fas fa-user-shield"></i> Admin Panel
+                </button>
             </div>
         </div>
     </nav>
@@ -47,7 +49,7 @@
     <div class="py-10 px-4">
         
         <!-- HALAMAN 1: FORM INPUT -->
-        <div id="inputSection" class="max-w-4xl mx-auto glass-card rounded-2xl shadow-2xl overflow-hidden bg-white transition-all duration-500">
+        <div id="inputSection" class="max-w-4xl mx-auto glass-card rounded-2xl shadow-2xl overflow-hidden bg-white">
             <div class="bg-blue-900 p-8 text-white text-center border-b-4 border-yellow-400">
                 <h1 class="text-2xl font-bold uppercase tracking-wider mb-1">Formulir Pendaftaran Wisuda</h1>
                 <h2 class="text-xl font-bold uppercase tracking-wide mb-1 text-yellow-400">Fakultas Keguruan dan Ilmu Pendidikan</h2>
@@ -96,39 +98,34 @@
                     </div>
                 </div>
 
-                <!-- BAGIAN LAMPIRAN YANG DIPERBARUI -->
+                <!-- LAMPIRAN -->
                 <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6">
                     <h3 class="font-bold text-gray-800 mb-4 text-sm uppercase flex items-center gap-2">
                         <i class="fas fa-paperclip text-blue-900"></i> Persyaratan Lampiran:
                     </h3>
                     <div class="space-y-4 text-sm text-gray-700">
-                        <!-- File 1 -->
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                             <label class="font-medium text-gray-700">1) Fotokopi Ijazah Terakhir (Legalisir)</label>
-                            <input type="file" id="file_ijazah" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                            <input type="file" id="file_ijazah" class="text-xs">
                         </div>
-                        <!-- File 2 -->
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                             <label class="font-medium text-gray-700">2) Fotokopi KTP</label>
-                            <input type="file" id="file_ktp" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                            <input type="file" id="file_ktp" class="text-xs">
                         </div>
-                        <!-- File 3 -->
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                             <label class="font-medium text-gray-700">3) Surat Bebas Biaya Pendidikan</label>
-                            <input type="file" id="file_bebas" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                            <input type="file" id="file_bebas" class="text-xs">
                         </div>
-                        <!-- File 4 -->
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                             <label class="font-medium text-gray-700">4) Sertifikat PKKMB</label>
-                            <input type="file" id="file_pkkmb" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                            <input type="file" id="file_pkkmb" class="text-xs">
                         </div>
                     </div>
-                    <p class="text-xs text-red-500 mt-2 italic">* Pastikan file yang diunggah dapat terbaca dengan jelas.</p>
                 </div>
 
                 <div class="pt-6 flex flex-col items-center">
-                    <div id="loadingSimpan" class="hidden mb-2 text-blue-900 font-bold"><div class="loader mr-2"></div>Mengirim Data...</div>
-                    <button type="submit" id="btnSimpan" class="bg-blue-900 text-white px-12 py-3 rounded-full font-bold hover:bg-blue-800 shadow-lg uppercase tracking-widest text-sm transition transform hover:-translate-y-1">
+                    <div id="loadingSimpan" class="hidden mb-2 text-blue-900 font-bold"><div class="loader mr-2"></div>Menghubungkan Database...</div>
+                    <button type="submit" id="btnSimpan" class="bg-blue-900 text-white px-12 py-3 rounded-full font-bold hover:bg-blue-800 shadow-lg uppercase tracking-widest text-sm transition transform hover:-translate-y-1 cursor-pointer">
                         <i class="fas fa-cloud-upload-alt mr-2"></i> Simpan Permanen & Preview
                     </button>
                 </div>
@@ -157,25 +154,20 @@
                 <tr><td class="font-bold">Kelulusan</td><td>:</td><td>Lulus: <span id="prev_tgl_lulus"></span> (IPK: <span id="prev_ipk"></span>)</td></tr>
             </table>
             
-            <!-- Preview Lampiran (Checklist Otomatis) -->
             <div class="mt-8 border border-black p-4">
                 <p class="font-bold mb-2 text-sm uppercase">Status Dokumen Lampiran:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 text-sm gap-2">
                     <div class="flex items-center gap-2">
-                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_ijazah"></div> 
-                        <span>Ijazah Legalisir</span>
+                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_ijazah"></div> <span>Ijazah Legalisir</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_ktp"></div> 
-                        <span>Fotokopi KTP</span>
+                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_ktp"></div> <span>Fotokopi KTP</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_bebas"></div> 
-                        <span>Surat Bebas Biaya</span>
+                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_bebas"></div> <span>Surat Bebas Biaya</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_pkkmb"></div> 
-                        <span>Sertifikat PKKMB</span>
+                        <div class="w-5 h-5 border border-black flex items-center justify-center font-bold text-green-700" id="check_pkkmb"></div> <span>Sertifikat PKKMB</span>
                     </div>
                 </div>
             </div>
@@ -197,7 +189,7 @@
         <!-- HALAMAN 3: ADMIN PANEL (Realtime) -->
         <div id="adminSection" class="hidden max-w-6xl mx-auto glass-card rounded-2xl shadow-2xl p-8 bg-white mt-4">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-server"></i> Database Pendaftar Realtime</h2>
+                <h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-server"></i> Database Pendaftar (Admin Only)</h2>
                 <button onclick="logoutAdmin()" class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700">Logout</button>
             </div>
             <div class="overflow-x-auto">
@@ -213,19 +205,50 @@
                         </tr>
                     </thead>
                     <tbody id="adminTableBody" class="text-sm text-center text-gray-700">
-                        <tr><td colspan="6" class="py-8"><div class="loader inline-block"></div> Menghubungkan Server...</td></tr>
+                        <tr><td colspan="6" class="py-8"><div class="loader inline-block"></div> Menunggu Koneksi Database...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPT UTAMA -->
     <script>
+        // --- NAVIGASI (Diletakkan di atas agar tetap jalan walau Firebase Error) ---
+        function showPage(pageId) {
+            document.querySelectorAll('#inputSection, #previewSection, #adminSection').forEach(el => el.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function checkLogin() {
+            // Cek apakah script Firebase crash atau tidak
+            if (typeof firebaseConfig === 'undefined') {
+                alert("CRITICAL ERROR: Syntax Config Salah!\n\nSepertinya Anda salah copy-paste kode Firebase (ada kurung kurawal atau tanda petik yang hilang). \nSilakan cek ulang kode di file index.html.");
+                return;
+            }
+
+            const pass = prompt("Masukkan Password Admin:");
+            if (pass === "admin123") {
+                showPage('adminSection');
+                // Coba load data, jika DB error, tabel akan tetap kosong tapi halaman terbuka
+                try {
+                    loadRealtimeData();
+                } catch(e) {
+                    console.log("DB Error: " + e);
+                    document.getElementById('adminTableBody').innerHTML = '<tr><td colspan="6" class="py-8 text-red-500 font-bold">Gagal terhubung ke Database. Cek Config Anda.</td></tr>';
+                }
+            } else if (pass !== null) {
+                alert("Password Salah!");
+            }
+        }
+
+        function logoutAdmin() { showPage('inputSection'); }
+
         // =========================================================================
-        // --- 1. KONFIGURASI FIREBASE ---
+        // --- AREA CONFIG FIREBASE (KODE YANG SUDAH DIPERBAIKI) ---
         // =========================================================================
         
-        // PASTE KODE CONFIG ANDA DI SINI (Timpa yang lama)
         const firebaseConfig = {
             apiKey: "AIzaSyC9FbDnb2qRSBOOrp-iVdCk5yQDHr9QAKw",
             authDomain: "wisudafkip-9bf28.firebaseapp.com",
@@ -233,38 +256,40 @@
             projectId: "wisudafkip-9bf28",
             storageBucket: "wisudafkip-9bf28.firebasestorage.app",
             messagingSenderId: "528206555265",
-            appId: "1:528206555265:web:0e0df4d93fd0db58e68580"
+            appId: "1:528206555265:web:0e0df4d93fd0db58e68580", // <-- KOMA SUDAH DITAMBAHKAN
             measurementId: "G-NW845QP4VR"
         };
+
         // =========================================================================
 
-        // --- 2. INISIALISASI ---
         let db;
+        
+        // Coba inisialisasi Firebase dengan Error Handling yang kuat
         try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            console.log("Firebase Connected");
+            if (firebaseConfig.apiKey.includes("MASUKKAN_API_KEY")) {
+                console.warn("⚠️ PERINGATAN: Config Firebase belum diisi.");
+            } else {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                console.log("✅ Firebase Berhasil Terhubung");
+            }
         } catch (e) {
-            console.error("Firebase Error: Belum disetting. " + e);
+            console.error("🔥 FIREBASE CRASH: " + e.message);
+            alert("Terjadi kesalahan pada Kode Config Firebase Anda:\n\n" + e.message + "\n\nMohon periksa tanda petik atau kurung kurawal.");
         }
 
-        // --- 3. NAVIGASI ---
-        function showPage(pageId) {
-            document.querySelectorAll('#inputSection, #previewSection, #adminSection').forEach(el => el.classList.add('hidden'));
-            document.getElementById(pageId).classList.remove('hidden');
-            window.scrollTo(0,0);
-        }
-
-        // --- 4. SIMPAN DATA (KE SERVER FIREBASE) ---
+        // --- FUNGSI SIMPAN ---
         function handleSimpan(e) {
             e.preventDefault();
-            
-            if (!db) { alert("ERROR: Database belum dikonfigurasi! Edit file HTML ini dan masukkan Config Firebase."); return; }
+
+            if (!db) {
+                alert("⛔ DATABASE BELUM TERHUBUNG!\n\nAnda belum mengganti kode 'firebaseConfig' dengan benar.\nSilakan edit file index.html lalu masukkan API Key dari Firebase Console.");
+                return;
+            }
 
             document.getElementById('btnSimpan').classList.add('hidden');
             document.getElementById('loadingSimpan').classList.remove('hidden');
 
-            // Cek Apakah File Dilampirkan (True/False)
             const hasIjazah = document.getElementById('file_ijazah').files.length > 0;
             const hasKtp = document.getElementById('file_ktp').files.length > 0;
             const hasBebas = document.getElementById('file_bebas').files.length > 0;
@@ -291,7 +316,6 @@
                 ipk: document.getElementById('input_ipk').value,
                 yudisium: document.getElementById('input_yudisium').value,
                 alamat: document.getElementById('input_alamat').value,
-                // Status Lampiran
                 lampiran: {
                     ijazah: hasIjazah,
                     ktp: hasKtp,
@@ -300,15 +324,22 @@
                 }
             };
 
-            // Kirim ke Firebase
+            const timeout = setTimeout(() => {
+                alert("Waktu habis! Koneksi lambat atau Database Terkunci.\nPastikan RULES Firebase sudah diset TRUE.");
+                document.getElementById('btnSimpan').classList.remove('hidden');
+                document.getElementById('loadingSimpan').classList.add('hidden');
+            }, 10000);
+
             db.ref('pendaftar/' + id).set(formData)
             .then(() => {
+                clearTimeout(timeout);
                 isiPreview(formData);
                 showPage('previewSection');
-                alert('Sukses! Data tersimpan di Server Admin.');
+                alert('Data Berhasil Disimpan ke Server!');
             })
             .catch((error) => {
-                alert('Gagal menyimpan: ' + error.message);
+                clearTimeout(timeout);
+                alert('Gagal Simpan: ' + error.message);
                 document.getElementById('btnSimpan').classList.remove('hidden');
             })
             .finally(() => {
@@ -317,7 +348,6 @@
         }
 
         function isiPreview(data) {
-            // Data Teks
             document.getElementById('prev_gelombang').innerText = data.gelombang;
             document.getElementById('prev_tahun').innerText = data.tahun;
             document.getElementById('prev_nama').innerText = data.nama;
@@ -336,28 +366,19 @@
             document.getElementById('prev_ipk').innerText = data.ipk;
             document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
 
-            // Data Checklist Lampiran (Muncul Centang Jika Ada)
             document.getElementById('check_ijazah').innerText = data.lampiran.ijazah ? "✓" : "✗";
             document.getElementById('check_ktp').innerText = data.lampiran.ktp ? "✓" : "✗";
             document.getElementById('check_bebas').innerText = data.lampiran.bebas ? "✓" : "✗";
             document.getElementById('check_pkkmb').innerText = data.lampiran.pkkmb ? "✓" : "✗";
         }
 
-        // --- 5. ADMIN ---
-        function checkLogin() {
-            const pass = prompt("Masukkan Password Admin:");
-            if (pass === "admin123") {
-                showPage('adminSection');
-                loadRealtimeData();
-            } else if (pass !== null) {
-                alert("Password Salah!");
-            }
-        }
-
-        function logoutAdmin() { showPage('inputSection'); }
-
+        // --- FUNGSI LOAD DATA ADMIN ---
         function loadRealtimeData() {
-            if (!db) return;
+            if (!db) {
+                document.getElementById('adminTableBody').innerHTML = '<tr><td colspan="6" class="py-8 text-gray-500">Database belum terhubung.</td></tr>';
+                return;
+            }
+            
             const tableBody = document.getElementById('adminTableBody');
             
             db.ref('pendaftar').on('value', (snapshot) => {
@@ -367,7 +388,6 @@
                 if (data) {
                     const dataArray = Object.values(data).reverse();
                     dataArray.forEach(item => {
-                        // Hitung jumlah berkas
                         let berkasCount = 0;
                         if(item.lampiran && item.lampiran.ijazah) berkasCount++;
                         if(item.lampiran && item.lampiran.ktp) berkasCount++;
@@ -395,11 +415,10 @@
         }
 
         function hapusData(id) {
-            if(confirm("Yakin ingin menghapus data ini dari server?")) {
+            if(confirm("Hapus data ini permanen?")) {
                 db.ref('pendaftar/' + id).remove();
             }
         }
     </script>
 </body>
 </html>
-
