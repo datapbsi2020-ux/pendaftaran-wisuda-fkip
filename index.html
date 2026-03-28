@@ -47,7 +47,7 @@
     <nav class="bg-blue-900/90 backdrop-blur text-white p-4 shadow-lg no-print fixed top-0 w-full z-50 border-b border-white/10">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="font-bold text-lg flex items-center gap-2">
-                <i class="fas fa-graduation-cap text-yellow-400"></i> <span class="hidden md:inline">SIP-WISUDA FKIP</span>
+                <i class="fas fa-graduation-cap text-yellow-400"></i> <span class="hidden md:inline">KULIAH FKIP UNWIR BAE</span>
             </div>
             <div class="flex items-center space-x-4">
                 <button onclick="showPage('inputSection')" class="hover:text-yellow-400 transition font-medium flex items-center gap-1">
@@ -301,13 +301,10 @@
 
         <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center no-print border-t pt-6">
             <button onclick="window.print()" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-black transition flex items-center justify-center gap-2">
-                <i class="fas fa-file-pdf"></i> 1. Cetak / Simpan PDF
+                <i class="fas fa-file-pdf"></i> Cetak / Simpan PDF
             </button>
-            <button onclick="sendToWhatsapp()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
-                <i class="fab fa-whatsapp text-lg"></i> 2. Konfirmasi ke WA
-            </button>
-            <button onclick="window.location.reload()" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                <i class="fas fa-plus"></i> Daftar Baru
+            <button onclick="window.location.reload()" class="bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-red-700 transition flex items-center justify-center gap-2">
+                <i class="fas fa-times"></i> Tutup
             </button>
         </div>
     </div>
@@ -361,7 +358,7 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPOk9n3u74NiFaDOPUlpblCYDVHXnflB0266cmJnrOalMk9WXzDBbtk6D5OVs2O7M-Tw/exec";
         const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1j2Q9vb0qcc6yJjx9YJZRmGQr83PZxDRIwA91aNUoens/edit?gid=0#gid=0";
         
-        let currentPayload = null; // Simpan data sementara untuk dikirim ke WA
+        let currentPayload = null; // Simpan data sementara
         // ==========================================================
 
         // --- CEK LOGIN SAAT HALAMAN DIMUAT ---
@@ -606,22 +603,6 @@
             document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', options);
 
             window.scrollTo(0,0);
-        }
-
-        // --- FUNGSI KIRIM KE WHATSAPP ---
-        function sendToWhatsapp() {
-            if (!currentPayload) { alert("Data belum tersedia."); return; }
-            const p = currentPayload;
-            
-            const text = `Assalamualaikum, saya mahasiswa pendaftar wisuda:\n\n` +
-                         `Nama: ${p.nama}\n` +
-                         `NPM: ${p.npm}\n` +
-                         `Prodi: ${p.prodi}\n` +
-                         `Gelombang: ${p.gelombang} (${p.tahun})\n\n` +
-                         `Saya telah melakukan pendaftaran online dan menyimpan bukti PDF pendaftaran. Mohon diverifikasi. Terimakasih.`;
-                         
-            const targetNumber = "6289668098244"; 
-            window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         // --- FUNGSI NAVIGASI HALAMAN ---
