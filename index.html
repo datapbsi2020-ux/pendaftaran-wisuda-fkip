@@ -14,14 +14,31 @@
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1e3a8a; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Animasi Table Row */
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Tampilan Khusus Cetak (A4 Style) */
         @media print {
             .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            .glass-card { box-shadow: none; border: none; width: 100%; margin: 0; padding: 0; }
+            body { background: white; padding: 0; margin: 0; }
+            .glass-card { 
+                box-shadow: none; 
+                border: none; 
+                width: 100%; 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 0; 
+                background: white;
+            }
+            #previewSection { 
+                display: block !important; 
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+            }
+            /* Sembunyikan elemen lain saat print */
+            #inputSection, #adminSection, nav { display: none !important; }
         }
     </style>
 </head>
@@ -116,10 +133,10 @@
                     <div><label class="text-xs font-bold text-gray-500 uppercase">Nama Ibu Kandung</label><input type="text" id="input_ibu" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
                     <div><label class="text-xs font-bold text-gray-500 uppercase">Email</label><input type="email" id="input_email" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
                     <div><label class="text-xs font-bold text-gray-500 uppercase">No. HP/WhatsApp</label><input type="text" id="input_hp" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
-                    <div><label class="text-xs font-bold text-gray-500 uppercase">Tanggal Kelulusan</label><input type="date" id="input_tgl_lulus" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Tanggal Kelulusan</label><input type="date" id="input_tgl_lulus" class="w-full border border-gray-300 p-3 rounded-xl focus:border-blue-500 outline-none" required></div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-xs font-bold text-gray-500 uppercase">IPK</label><input type="number" step="0.01" id="input_ipk" class="w-full border-b py-2 focus:border-blue-600 outline-none" required placeholder="0.00"></div>
-                        <div><label class="text-xs font-bold text-gray-500 uppercase">Yudisium</label><input type="text" id="input_yudisium" class="w-full border-b py-2 focus:border-blue-600 outline-none" placeholder="Sangat Memuaskan"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase mb-1 ml-1">IPK</label><input type="number" step="0.01" id="input_ipk" class="w-full border border-gray-300 p-3 rounded-xl focus:border-blue-500 outline-none" required placeholder="0.00" oninput="hitungYudisium()"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Yudisium</label><input type="text" id="input_yudisium" class="w-full border border-gray-300 p-3 rounded-xl focus:border-blue-500 outline-none bg-gray-100 cursor-not-allowed" placeholder="Terisi Otomatis" readonly></div>
                     </div>
                 </div>
             </div>
@@ -127,31 +144,29 @@
             <div><label class="text-xs font-bold text-gray-500 uppercase">Alamat Rumah Lengkap</label><textarea id="input_alamat" class="w-full border-b py-2 focus:border-blue-600 outline-none h-16 resize-none" required></textarea></div>
 
             <!-- Lampiran Upload -->
-            <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6 hover:bg-gray-100 transition">
+            <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6">
                 <h3 class="font-bold text-gray-800 mb-4 text-sm uppercase flex items-center gap-2">
-                    <i class="fas fa-paperclip text-blue-900"></i> Unggah Persyaratan Lampiran:
+                    <i class="fas fa-paperclip text-blue-900"></i> Unggah Lampiran (Wajib):
                 </h3>
                 <div class="space-y-4 text-sm text-gray-700">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">1) Fotokopi Ijazah Terakhir (Legalisir)</span>
-                        <input type="file" id="file_ijazah" accept=".pdf,.jpg,.jpeg,.png" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_ijazah" accept=".pdf,.jpg,.jpeg,.png" class="text-xs">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">2) Fotokopi KTP</span>
-                        <input type="file" id="file_ktp" accept=".pdf,.jpg,.jpeg,.png" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_ktp" accept=".pdf,.jpg,.jpeg,.png" class="text-xs">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">3) Surat Bebas Biaya Pendidikan</span>
-                        <input type="file" id="file_bebas" accept=".pdf,.jpg,.jpeg,.png" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_bebas" accept=".pdf,.jpg,.jpeg,.png" class="text-xs">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
                         <span class="font-medium">4) Sertifikat PKKMB</span>
-                        <input type="file" id="file_pkkmb" accept=".pdf,.jpg,.jpeg,.png" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                        <input type="file" id="file_pkkmb" accept=".pdf,.jpg,.jpeg,.png" class="text-xs">
                     </div>
                 </div>
-                <p class="text-[10px] text-red-500 mt-2 italic flex items-center gap-1">
-                    <i class="fas fa-info-circle"></i> Gunakan file PDF atau JPG/PNG. Maksimal ukuran per file disarankan < 5MB.
-                </p>
+                <p class="text-[10px] text-red-500 mt-2 italic">* Mohon tunggu proses upload (30-60 detik tergantung sinyal).</p>
             </div>
 
             <div class="pt-6 flex flex-col items-center">
@@ -165,23 +180,142 @@
         </form>
     </div>
 
-    <!-- HALAMAN 2: PREVIEW / BUKTI -->
-    <div id="previewSection" class="hidden max-w-4xl mx-auto glass-card rounded-3xl shadow-2xl p-12 bg-white mt-4 relative">
-        <div class="text-center border-b-2 border-gray-100 pb-6 mb-8">
-            <div class="text-green-500 text-5xl mb-4"><i class="fas fa-check-circle"></i></div>
-            <h1 class="text-2xl font-bold uppercase text-gray-800">Bukti Pendaftaran</h1>
-            <p class="text-gray-500">Data & Berkas Berhasil Disimpan di Database Fakultas</p>
+    <!-- HALAMAN 2: PREVIEW / BUKTI CETAK (FORMAL) -->
+    <div id="previewSection" class="hidden max-w-4xl mx-auto bg-white p-10 shadow-2xl min-h-screen relative rounded-xl mt-4">
+        
+        <!-- Header Dokumen Formal -->
+        <div class="text-center border-b-2 border-black pb-4 mb-6">
+            <h1 class="text-2xl font-bold uppercase tracking-wider">Formulir Pendaftaran Wisuda</h1>
+            <h2 class="text-xl font-bold uppercase mt-1">Fakultas Keguruan dan Ilmu Pendidikan</h2>
+            <h3 class="text-lg font-medium">Universitas Wiralodra</h3>
+            <p class="text-sm mt-2 font-medium">Wisuda Gelombang <span id="prev_gelombang"></span> Tahun <span id="prev_tahun"></span></p>
         </div>
-        <div id="previewContent" class="bg-gray-50 p-8 rounded-xl border border-gray-100"></div>
-        <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center no-print">
-            <button onclick="window.print()" class="bg-gray-800 text-white px-8 py-3 rounded-xl font-bold shadow hover:bg-black transition flex items-center justify-center gap-2"><i class="fas fa-print"></i> Cetak Bukti</button>
-            <button onclick="window.location.reload()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2"><i class="fas fa-plus"></i> Daftar Baru</button>
+
+        <!-- Konten Surat -->
+        <div class="px-2">
+            <table class="w-full text-sm leading-8 border-none">
+                <tr>
+                    <td class="w-48 font-bold">Nama Lengkap</td>
+                    <td class="w-4">:</td>
+                    <td id="prev_nama" class="uppercase font-semibold"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">NPM</td>
+                    <td>:</td>
+                    <td id="prev_npm"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Program Studi</td>
+                    <td>:</td>
+                    <td id="prev_prodi"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Kelas / Jenjang</td>
+                    <td>:</td>
+                    <td><span id="prev_kelas"></span> / <span id="prev_jenjang"></span></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Tempat, Tanggal Lahir</td>
+                    <td>:</td>
+                    <td id="prev_ttl"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Jenis Kelamin</td>
+                    <td>:</td>
+                    <td id="prev_jk"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">NIK (KTP)</td>
+                    <td>:</td>
+                    <td id="prev_nik"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Nama Ibu Kandung</td>
+                    <td>:</td>
+                    <td id="prev_ibu"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Alamat Rumah</td>
+                    <td>:</td>
+                    <td id="prev_alamat" class="capitalize"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Email</td>
+                    <td>:</td>
+                    <td id="prev_email"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">No. HP/WA</td>
+                    <td>:</td>
+                    <td id="prev_hp"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Tanggal Kelulusan</td>
+                    <td>:</td>
+                    <td id="prev_tgl_lulus"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">IPK / Yudisium</td>
+                    <td>:</td>
+                    <td><span id="prev_ipk"></span> / <span id="prev_yudisium"></span></td>
+                </tr>
+            </table>
+
+            <!-- Checklist Formal -->
+            <div class="mt-8 border-2 border-black p-4 bg-gray-50">
+                <p class="font-bold mb-3 underline text-sm">KELENGKAPAN BERKAS LAMPIRAN:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 text-sm gap-2">
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Foto kopi Ijazah Terakhir (Legalisir)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Foto kopi KTP</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Surat Keterangan Bebas Biaya</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Foto kopi Sertifikat PKKMB</span>
+                    </div>
+                </div>
+                <p class="text-xs mt-3 italic">* Berkas fisik telah diunggah ke Database Google Drive Fakultas secara otomatis.</p>
+            </div>
+
+            <!-- Tanda Tangan -->
+            <div class="mt-12 flex justify-end">
+                <div class="text-center w-64">
+                    <p class="text-sm">Indramayu, <span id="prev_tanggal_cetak"></span></p>
+                    <p class="text-sm font-bold mb-20">Pendaftar,</p>
+                    <div class="border-b border-black"></div>
+                    <p class="text-xs mt-1 text-gray-500 uppercase">( Tanda Tangan Mahasiswa )</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Aksi (Tidak Tercetak) -->
+        <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center no-print border-t pt-6">
+            <!-- Langkah 1: Simpan PDF -->
+            <button onclick="window.print()" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-black transition flex items-center justify-center gap-2">
+                <i class="fas fa-file-pdf"></i> 1. Cetak / Simpan PDF
+            </button>
+            
+            <!-- Langkah 2: Kirim WA -->
+            <button onclick="sendToWhatsapp()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
+                <i class="fab fa-whatsapp text-lg"></i> 2. Konfirmasi ke WA
+            </button>
+            
+            <button onclick="window.location.reload()" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                <i class="fas fa-plus"></i> Daftar Baru
+            </button>
         </div>
     </div>
 
     <!-- HALAMAN 3: ADMIN DASHBOARD (ELEGANT VIEW) -->
     <div id="adminSection" class="hidden max-w-7xl mx-auto mt-4">
-        <!-- Header Dashboard -->
         <div class="glass-dashboard rounded-3xl p-8 mb-8 flex flex-col md:flex-row justify-between items-center shadow-2xl">
             <div class="mb-4 md:mb-0">
                 <h1 class="text-3xl font-bold text-slate-800">Dashboard Admin</h1>
@@ -189,9 +323,8 @@
             </div>
             
             <div class="flex gap-3">
-                <!-- Tombol 1: Database Mentah -->
                 <button onclick="window.open(SPREADSHEET_URL, '_blank')" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition flex items-center gap-2 text-sm">
-                    <i class="fas fa-table"></i> Buka Spreadsheet (Excel)
+                    <i class="fas fa-table"></i> Buka Spreadsheet
                 </button>
                 <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition text-sm">
                     Logout
@@ -199,7 +332,6 @@
             </div>
         </div>
 
-        <!-- Tombol 2: Tampilan Visual (Tabel Elegan) -->
         <div class="glass-dashboard rounded-3xl p-6 shadow-2xl bg-white/90">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-list-alt mr-2 text-blue-600"></i> Daftar Pendaftar</h2>
@@ -230,29 +362,71 @@
         // KONFIGURASI
         // ==========================================================
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPOk9n3u74NiFaDOPUlpblCYDVHXnflB0266cmJnrOalMk9WXzDBbtk6D5OVs2O7M-Tw/exec";
-        const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1j2Q9vb0qcc6yJjx9YJZRmGQr83PZxDRIwA91aNUoens/edit?gid=0#gid=0"; // Ganti dengan URL Sheet Anda
+        const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1j2Q9vb0qcc6yJjx9YJZRmGQr83PZxDRIwA91aNUoens/edit?gid=0#gid=0";
+        
+        let currentPayload = null; // Simpan data untuk WA
         // ==========================================================
 
+        // --- CEK LOGIN SAAT LOAD (PERSISTENCE) ---
+        window.onload = function() {
+            if (sessionStorage.getItem("isAdmin") === "true") {
+                // Langsung tampilkan admin panel jika sesi masih ada
+                showPage('adminSection');
+                loadAdminData();
+            }
+        };
+
         function checkLogin() {
+            if (sessionStorage.getItem("isAdmin") === "true") {
+                showPage('adminSection');
+                loadAdminData();
+                return;
+            }
+
             const pass = prompt("Masukkan Password Admin:");
             if (pass === "admin123") {
+                sessionStorage.setItem("isAdmin", "true"); // Simpan Sesi
                 showPage('adminSection');
-                loadAdminData(); // Ambil data saat login berhasil
+                loadAdminData();
             } else if (pass !== null) {
                 alert("Password Salah!");
             }
         }
 
         function logoutAdmin() {
+            sessionStorage.removeItem("isAdmin"); // Hapus Sesi
             showPage('inputSection');
         }
 
-        // --- FUNGSI LOAD DATA ADMIN (GET) ---
+        // --- FUNGSI HITUNG YUDISIUM OTOMATIS ---
+        function hitungYudisium() {
+            const ipkValue = document.getElementById('input_ipk').value;
+            const yudisiumInput = document.getElementById('input_yudisium');
+            const ipk = parseFloat(ipkValue);
+            
+            if (isNaN(ipk)) {
+                yudisiumInput.value = "";
+                return;
+            }
+            
+            if (ipk >= 3.51 && ipk <= 4.00) {
+                yudisiumInput.value = "Dengan Pujian";
+            } else if (ipk >= 3.00 && ipk <= 3.50) {
+                yudisiumInput.value = "Sangat Memuaskan";
+            } else if (ipk >= 2.75 && ipk <= 2.99) {
+                yudisiumInput.value = "Memuaskan";
+            } else if (ipk > 0 && ipk < 2.75) {
+                yudisiumInput.value = "Cukup"; 
+            } else {
+                yudisiumInput.value = "";
+            }
+        }
+
+        // --- FUNGSI LOAD DATA ADMIN ---
         async function loadAdminData() {
             const tbody = document.getElementById('adminTableBody');
             
             try {
-                // Panggil Script dengan mode GET
                 const response = await fetch(SCRIPT_URL);
                 const json = await response.json();
 
@@ -264,22 +438,6 @@
 
                     let html = '';
                     json.data.forEach(item => {
-                        // Cek kelengkapan file (Simulasi logika sederhana: jika link bukan "-", berarti ada)
-                        // Karena di script backend kita set "-" jika kosong.
-                        // Namun data GET dari script harus kita sesuaikan strukturnya di backend dulu agar mengirim status file.
-                        // Asumsi: Backend mengirim array data mentah. Kita perlu mapping indexnya.
-                        
-                        // Mapping Data (Sesuaikan index dengan urutan kolom di Spreadsheet)
-                        // [0]Waktu, [1]Gel, [2]Thn, [3]Nama, [4]NPM, [5]Prodi, ..., [18]Ijazah, [19]KTP, [20]Bebas, [21]PKKMB
-                        
-                        // Logika Status Berkas
-                        const files = [item.link_ijazah, item.link_ktp, item.link_bebas, item.link_pkkmb]; // Anda perlu update backend doGet() agar return field ini
-                        // Untuk sementara, kita pakai placeholder logika karena backend doGet() perlu disesuaikan.
-                        // Di sini saya pakai logika dummy "Lengkap" jika ada link folder.
-                        
-                        // TAPI: Karena Script Backend doGet() yang saya kasih sebelumnya return object {nama, npm, prodi, link_folder...}
-                        // Mari kita pakai itu.
-                        
                         const statusBadge = item.link_folder && item.link_folder.startsWith('http') 
                             ? `<span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-green-200">Berkas Masuk</span>` 
                             : `<span class="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">Belum Lengkap</span>`;
@@ -384,6 +542,8 @@
                     files: { ijazah: ijazahB64, ktp: ktpB64, bebas: bebasB64, pkkmb: pkkmbB64 }
                 };
 
+                currentPayload = payload;
+
                 document.getElementById('loadingMsg').innerText = "Mengirim data ke server...";
 
                 const response = await fetch(SCRIPT_URL, {
@@ -412,28 +572,51 @@
             document.getElementById('inputSection').classList.add('hidden');
             document.getElementById('previewSection').classList.remove('hidden');
             
-            let html = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
-                    <div class="p-4 bg-gray-50 rounded-xl border">
-                        <p class="text-xs text-gray-500 uppercase font-bold">Nama Lengkap</p>
-                        <p class="font-medium text-lg capitalize">${data.nama}</p>
-                    </div>
-                    <div class="p-4 bg-gray-50 rounded-xl border">
-                        <p class="text-xs text-gray-500 uppercase font-bold">NPM</p>
-                        <p class="font-medium text-lg">${data.npm}</p>
-                    </div>
-                    <div class="p-4 bg-gray-50 rounded-xl border">
-                        <p class="text-xs text-gray-500 uppercase font-bold">Program Studi</p>
-                        <p class="font-medium">${data.prodi}</p>
-                    </div>
-                    <div class="p-4 bg-gray-50 rounded-xl border">
-                        <p class="text-xs text-gray-500 uppercase font-bold">Waktu Daftar</p>
-                        <p class="font-medium">${new Date().toLocaleString('id-ID')}</p>
-                    </div>
-                </div>
-            `;
-            document.getElementById('previewContent').innerHTML = html;
+            // Isi data ke template preview
+            document.getElementById('prev_gelombang').innerText = data.gelombang;
+            document.getElementById('prev_tahun').innerText = data.tahun;
+            document.getElementById('prev_nama').innerText = data.nama;
+            document.getElementById('prev_npm').innerText = data.npm;
+            document.getElementById('prev_prodi').innerText = data.prodi;
+            document.getElementById('prev_kelas').innerText = data.kelas;
+            document.getElementById('prev_jenjang').innerText = data.jenjang;
+            document.getElementById('prev_ttl').innerText = data.ttl;
+            document.getElementById('prev_jk').innerText = data.jk;
+            document.getElementById('prev_nik').innerText = data.nik;
+            document.getElementById('prev_ibu').innerText = data.ibu;
+            document.getElementById('prev_alamat').innerText = data.alamat;
+            document.getElementById('prev_email').innerText = data.email;
+            document.getElementById('prev_hp').innerText = data.hp;
+            document.getElementById('prev_tgl_lulus').innerText = data.tgl_lulus;
+            document.getElementById('prev_ipk').innerText = data.ipk;
+            document.getElementById('prev_yudisium').innerText = data.yudisium;
+            
+            // Tanggal Cetak
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', options);
+
             window.scrollTo(0,0);
+        }
+
+        function sendToWhatsapp() {
+            if (!currentPayload) {
+                alert("Data belum tersedia.");
+                return;
+            }
+            
+            const p = currentPayload;
+            // Pesan WA: Konfirmasi + Instruksi kirim PDF
+            const text = `Assalamualaikum, saya mahasiswa pendaftar wisuda:\n\n` +
+                         `Nama: ${p.nama}\n` +
+                         `NPM: ${p.npm}\n` +
+                         `Prodi: ${p.prodi}\n` +
+                         `Gelombang: ${p.gelombang} (${p.tahun})\n\n` +
+                         `Saya telah melakukan pendaftaran online dan menyimpan bukti PDF. Mohon diverifikasi. Terimakasih.`;
+                         
+            const encodedText = encodeURIComponent(text);
+            const targetNumber = "6289668098244"; 
+            
+            window.open(`https://wa.me/${targetNumber}?text=${encodedText}`, '_blank');
         }
 
         function showPage(id) { 
