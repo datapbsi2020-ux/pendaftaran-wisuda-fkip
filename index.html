@@ -1,115 +1,638 @@
-// --- KONFIGURASI ---
-// Masukkan ID Folder Google Drive Anda
-const FOLDER_ID = "MASUKKAN_ID_FOLDER_DRIVE_DISINI"; 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Wisuda FKIP - Universitas Wiralodra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.98); }
+        .glass-dashboard { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1e3a8a; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-// 1. FUNGSI MENERIMA/MENYIMPAN DATA (Saat mahasiswa daftar)
-function doPost(e) {
-  const lock = LockService.getScriptLock();
-  lock.tryLock(10000);
+        /* Tampilan Khusus Cetak (A4 Style) */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; margin: 0; }
+            .glass-card { 
+                box-shadow: none; 
+                border: none; 
+                width: 100%; 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 0; 
+                background: white;
+            }
+            #previewSection { 
+                display: block !important; 
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+            }
+            /* Sembunyikan elemen lain saat print */
+            #inputSection, #adminSection, nav { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-slate-800 to-black min-h-screen text-gray-800 py-10 px-4">
 
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheets()[0];
-    
-    let data;
-    try {
-      data = JSON.parse(e.postData.contents);
-    } catch(err) {
-      return responseJSON({ status: "error", message: "Gagal baca JSON" });
-    }
+    <nav class="bg-blue-900/90 backdrop-blur text-white p-4 shadow-lg no-print fixed top-0 w-full z-50 border-b border-white/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="font-bold text-lg flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-yellow-400"></i> <span class="hidden md:inline">SIP-WISUDA FKIP</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="showPage('inputSection')" class="hover:text-yellow-400 transition font-medium flex items-center gap-1">
+                    <i class="fas fa-edit"></i> Daftar
+                </button>
+                <button onclick="checkLogin()" class="bg-yellow-500 text-blue-900 px-4 py-1.5 rounded-full font-bold hover:bg-yellow-400 transition cursor-pointer shadow-md border-2 border-yellow-600 text-sm flex items-center gap-1">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+            </div>
+        </div>
+    </nav>
 
-    // Buat Folder Mahasiswa
-    const rootFolder = DriveApp.getFolderById(FOLDER_ID);
-    const folderName = `${data.npm} - ${data.nama}`;
-    const folders = rootFolder.getFoldersByName(folderName);
-    let subFolder = folders.hasNext() ? folders.next() : rootFolder.createFolder(folderName);
-    
-    const saveFile = (base64, name) => {
-      if (!base64 || base64.length < 10) return "-";
-      try {
-        const split = base64.split(',');
-        const type = split[0].split(';')[0].replace('data:', '');
-        const decoded = Utilities.base64Decode(split[1]);
-        const blob = Utilities.newBlob(decoded, type, name);
-        const file = subFolder.createFile(blob);
-        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        return file.getUrl();
-      } catch (err) { return "-"; }
-    };
+    <div class="h-16 no-print"></div>
 
-    const urlIjazah = saveFile(data.files.ijazah, `Ijazah_${data.npm}`);
-    const urlKtp = saveFile(data.files.ktp, `KTP_${data.npm}`);
-    const urlBebas = saveFile(data.files.bebas, `BebasBiaya_${data.npm}`);
-    const urlPkkmb = saveFile(data.files.pkkmb, `PKKMB_${data.npm}`);
+    <div id="inputSection" class="max-w-4xl mx-auto glass-card rounded-2xl shadow-2xl overflow-hidden bg-white mt-4 transition-all duration-500">
+        <div class="bg-blue-900 p-8 text-white text-center border-b-4 border-yellow-400">
+            <div class="overflow-hidden w-full">
+                <marquee direction="left" scrollamount="8" behavior="scroll" class="text-2xl font-bold uppercase tracking-wider mb-1">
+                    Formulir Pendaftaran Wisuda
+                </marquee>
+            </div>
+            <h2 class="text-xl font-bold uppercase tracking-wide mb-1 text-yellow-400">Fakultas Keguruan dan Ilmu Pendidikan</h2>
+            <h3 class="text-lg opacity-90 font-medium tracking-wide">Universitas Wiralodra</h3>
+        </div>
 
-    // Masukkan ke Sheet
-    // PASTIKAN URUTAN INI SAMA DENGAN KOLOM DI SPREADSHEET ANDA
-    sheet.appendRow([
-      new Date(),                           // 1. Waktu
-      data.gelombang,                       // 2. Gelombang
-      data.tahun,                           // 3. Tahun
-      data.nama,                            // 4. Nama
-      "'" + data.npm,                       // 5. NPM (Pakai ' agar tidak jadi rumus)
-      data.prodi,                           // 6. Prodi
-      data.kelas,                           // 7. Kelas
-      data.jenjang,                         // 8. Jenjang
-      data.ttl,                             // 9. TTL
-      data.jk,                              // 10. Jenis Kelamin
-      "'" + data.nik,                       // 11. NIK
-      data.ibu,                             // 12. Nama Ibu
-      data.email,                           // 13. Email
-      "'" + data.hp,                        // 14. No HP
-      data.tgl_lulus,                       // 15. Tgl Lulus
-      data.ipk,                             // 16. IPK
-      data.yudisium,                        // 17. Yudisium
-      data.alamat,                          // 18. Alamat
-      data.judul_skripsi ? data.judul_skripsi : "-", // 19. JUDUL SKRIPSI
-      urlIjazah,                            // 20. Link Ijazah
-      urlKtp,                               // 21. Link KTP
-      urlBebas,                             // 22. Link Bebas Biaya
-      urlPkkmb,                             // 23. Link PKKMB
-      subFolder.getUrl()                    // 24. Link Folder Induk Drive
-    ]);
+        <form id="wisudaForm" class="p-8 md:p-10 space-y-6" onsubmit="handleSimpan(event)">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-5 rounded-xl border border-blue-100">
+                <div>
+                    <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Gelombang Wisuda</label>
+                    <select id="input_gelombang" class="w-full border p-2 rounded bg-white outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="I">Gelombang I</option>
+                        <option value="II" selected>Gelombang II</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Tahun Akademik</label>
+                    <select id="input_tahun" class="w-full border p-2 rounded bg-white outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option>2025</option>
+                        <option>2026</option>
+                        <option>2027</option>
+                        <option>2028</option>
+                        <option>2029</option>
+                        <option>2030</option>
+                    </select>
+                </div>
+            </div>
 
-    return responseJSON({ status: "success", message: "Tersimpan" });
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                <div class="space-y-4">
+                    <h3 class="font-bold text-blue-800 border-b pb-1 uppercase text-sm italic">Identitas Mahasiswa</h3>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Nama Lengkap</label><input type="text" id="input_nama" class="w-full border-b py-2 focus:border-blue-600 outline-none" required placeholder="Sesuai Ijazah"></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">NPM</label><input type="text" id="input_npm" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Program Studi</label>
+                        <select id="input_prodi" class="w-full border p-2 rounded mt-1 bg-gray-50 focus:bg-white" required>
+                            <option>Pendidikan Bahasa dan Sastra Indonesia</option>
+                            <option>Pendidikan Bahasa Inggris</option>
+                            <option>Pendidikan Matematika</option>
+                            <option>Pendidikan Biologi</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Kelas</label><select id="input_kelas" class="w-full border p-2 rounded mt-1"><option>Reguler</option><option>Nonreguler</option></select></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase">Jenjang</label><select id="input_jenjang" class="w-full border p-2 rounded mt-1"><option>Sarjana</option><option>Magister</option></select></div>
+                    </div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Tempat, Tanggal Lahir</label><input type="text" id="input_ttl" class="w-full border-b py-2 focus:border-blue-600 outline-none" required placeholder="Contoh: Indramayu, 01 Jan 2000"></div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Jenis Kelamin</label>
+                        <div class="flex gap-4 mt-2">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="jk" value="Laki-laki" checked> Laki-laki</label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="jk" value="Perempuan"> Perempuan</label>
+                        </div>
+                    </div>
+                </div>
 
-  } catch (err) {
-    return responseJSON({ status: "error", message: err.toString() });
-  } finally {
-    lock.releaseLock();
-  }
-}
+                <div class="space-y-4">
+                    <h3 class="font-bold text-blue-800 border-b pb-1 uppercase text-sm italic">Kontak & Keluarga</h3>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">NIK (Sesuai KTP)</label><input type="text" id="input_nik" class="w-full border-b py-2 focus:border-blue-600 outline-none" required maxlength="16"></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Nama Ibu Kandung</label><input type="text" id="input_ibu" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Email</label><input type="email" id="input_email" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">No. HP/WhatsApp</label><input type="text" id="input_hp" class="w-full border-b py-2 focus:border-blue-600 outline-none" required></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Tanggal Kelulusan</label><input type="date" id="input_tgl_lulus" class="w-full border border-gray-300 p-3 rounded-xl focus:border-blue-500 outline-none" required></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="text-xs font-bold text-gray-500 uppercase mb-1 ml-1">IPK</label><input type="number" step="0.01" id="input_ipk" class="w-full border border-gray-300 p-3 rounded-xl focus:border-blue-500 outline-none" required placeholder="0.00" oninput="hitungYudisium()"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Yudisium</label><input type="text" id="input_yudisium" class="w-full border border-gray-300 p-3 rounded-xl focus:border-blue-500 outline-none bg-gray-100 cursor-not-allowed" placeholder="Terisi Otomatis" readonly></div>
+                    </div>
+                </div>
+            </div>
 
-// 2. FUNGSI MEMBACA DATA (Agar muncul di Tabel Admin Web)
-function doGet(e) {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheets()[0];
-    const rows = sheet.getDataRange().getValues();
-    
-    // Perbaikan: Cek jika data kosong (hanya header)
-    if (rows.length <= 1) {
-      return responseJSON({ status: "success", data: [] });
-    }
-    
-    rows.shift(); // Hapus Header (Baris pertama)
-    
-    const result = rows.map(row => ({
-      waktu: row[0] ? row[0] : "",
-      nama: row[3] ? row[3].toString() : "-",
-      npm: row[4] ? row[4].toString().replace(/'/g, "") : "-", 
-      prodi: row[5] ? row[5].toString() : "-",
-      hp: row[13] ? row[13].toString().replace(/'/g, "") : "-",
-      link_folder: row[23] || row[19] || "" // Ambil link folder Drive (berada di kolom ke-24 / index 23)
-    })).reverse(); // Urutkan dari yang terbaru ke terlama
+            <div>
+                <label class="text-xs font-bold text-gray-500 uppercase">Alamat Rumah Lengkap</label>
+                <textarea id="input_alamat" class="w-full border-b py-2 focus:border-blue-600 outline-none h-16 resize-none" required></textarea>
+            </div>
+            
+            <div class="mt-4">
+                <label class="text-xs font-bold text-gray-500 uppercase">Judul Skripsi</label>
+                <textarea id="input_judul_skripsi" class="w-full border-b py-2 focus:border-blue-600 outline-none h-16 resize-none" required></textarea>
+            </div>
 
-    return responseJSON({ status: "success", data: result });
-    
-  } catch (err) {
-    return responseJSON({ status: "error", message: err.toString() });
-  }
-}
+            <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6">
+                <h3 class="font-bold text-gray-800 mb-4 text-sm uppercase flex items-center gap-2">
+                    <i class="fas fa-paperclip text-blue-900"></i> Unggah Lampiran (Wajib):
+                </h3>
+                <div class="space-y-4 text-sm text-gray-700">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
+                        <span class="font-medium">1) Fotokopi Ijazah Terakhir (Legalisir)</span>
+                        <input type="file" id="file_ijazah" accept=".pdf,.jpg,.jpeg,.png" class="text-xs" required>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
+                        <span class="font-medium">2) Fotokopi KTP</span>
+                        <input type="file" id="file_ktp" accept=".pdf,.jpg,.jpeg,.png" class="text-xs" required>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
+                        <span class="font-medium">3) Surat Bebas Biaya Pendidikan</span>
+                        <input type="file" id="file_bebas" accept=".pdf,.jpg,.jpeg,.png" class="text-xs" required>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-2">
+                        <span class="font-medium">4) Sertifikat PKKMB</span>
+                        <input type="file" id="file_pkkmb" accept=".pdf,.jpg,.jpeg,.png" class="text-xs" required>
+                    </div>
+                </div>
+                <p class="text-[10px] text-red-500 mt-2 italic">* Mohon tunggu proses upload (30-60 detik tergantung sinyal internet Anda).</p>
+            </div>
 
-function responseJSON(content) {
-  return ContentService.createTextOutput(JSON.stringify(content)).setMimeType(ContentService.MimeType.JSON);
-}
+            <div class="pt-6 flex flex-col items-center">
+                <div id="loading" class="hidden mb-3 text-blue-900 font-bold flex items-center gap-2 bg-blue-100 px-4 py-2 rounded-lg">
+                    <div class="loader"></div> <span id="loadingMsg">Sedang memproses data...</span>
+                </div>
+                <button type="submit" id="btnSubmit" class="bg-blue-900 text-white px-12 py-4 rounded-full font-bold hover:bg-blue-800 shadow-lg uppercase tracking-widest text-sm transition transform hover:-translate-y-1 w-full md:w-auto">
+                    <i class="fas fa-paper-plane mr-2"></i> Kirim Pendaftaran
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="previewSection" class="hidden max-w-4xl mx-auto bg-white p-10 shadow-2xl min-h-screen relative rounded-xl mt-4">
+        
+        <div class="text-center border-b-2 border-black pb-4 mb-6">
+            <h1 class="text-2xl font-bold uppercase tracking-wider">Formulir Pendaftaran Wisuda</h1>
+            <h2 class="text-xl font-bold uppercase mt-1">Fakultas Keguruan dan Ilmu Pendidikan</h2>
+            <h3 class="text-lg font-medium">Universitas Wiralodra</h3>
+            <p class="text-sm mt-2 font-medium">Wisuda Gelombang <span id="prev_gelombang"></span> Tahun <span id="prev_tahun"></span></p>
+        </div>
+
+        <div class="px-2">
+            <table class="w-full text-sm leading-8 border-none">
+                <tr>
+                    <td class="w-48 font-bold">Nama Lengkap</td>
+                    <td class="w-4">:</td>
+                    <td id="prev_nama" class="uppercase font-semibold"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">NPM</td>
+                    <td>:</td>
+                    <td id="prev_npm"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Program Studi</td>
+                    <td>:</td>
+                    <td id="prev_prodi"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Kelas / Jenjang</td>
+                    <td>:</td>
+                    <td><span id="prev_kelas"></span> / <span id="prev_jenjang"></span></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Tempat, Tanggal Lahir</td>
+                    <td>:</td>
+                    <td id="prev_ttl"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Jenis Kelamin</td>
+                    <td>:</td>
+                    <td id="prev_jk"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">NIK (KTP)</td>
+                    <td>:</td>
+                    <td id="prev_nik"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Nama Ibu Kandung</td>
+                    <td>:</td>
+                    <td id="prev_ibu"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Alamat Rumah</td>
+                    <td>:</td>
+                    <td id="prev_alamat" class="capitalize"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold align-top">Judul Skripsi</td>
+                    <td class="align-top">:</td>
+                    <td id="prev_judul_skripsi" class="italic text-justify"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Email</td>
+                    <td>:</td>
+                    <td id="prev_email"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">No. HP/WA</td>
+                    <td>:</td>
+                    <td id="prev_hp"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Tanggal Kelulusan</td>
+                    <td>:</td>
+                    <td id="prev_tgl_lulus"></td>
+                </tr>
+                <tr>
+                    <td class="font-bold">IPK / Yudisium</td>
+                    <td>:</td>
+                    <td><span id="prev_ipk"></span> / <span id="prev_yudisium"></span></td>
+                </tr>
+            </table>
+
+            <div class="mt-8 border-2 border-black p-4 bg-gray-50">
+                <p class="font-bold mb-3 underline text-sm">KELENGKAPAN BERKAS LAMPIRAN:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 text-sm gap-2">
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Foto kopi Ijazah Terakhir (Legalisir)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Foto kopi KTP</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Surat Keterangan Bebas Biaya</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-check-square text-lg"></i>
+                        <span>Foto kopi Sertifikat PKKMB</span>
+                    </div>
+                </div>
+                <p class="text-xs mt-3 italic">* Berkas fisik telah diunggah ke Database Google Drive Fakultas secara otomatis.</p>
+            </div>
+
+            <div class="mt-12 flex justify-end">
+                <div class="text-center w-64">
+                    <p class="text-sm">Indramayu, <span id="prev_tanggal_cetak"></span></p>
+                    <p class="text-sm font-bold mb-20">Pendaftar,</p>
+                    <div class="border-b border-black"></div>
+                    <p class="text-xs mt-1 text-gray-500 uppercase">( Tanda Tangan Mahasiswa )</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center no-print border-t pt-6">
+            <button onclick="window.print()" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-black transition flex items-center justify-center gap-2">
+                <i class="fas fa-file-pdf"></i> 1. Cetak / Simpan PDF
+            </button>
+            <button onclick="sendToWhatsapp()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
+                <i class="fab fa-whatsapp text-lg"></i> 2. Konfirmasi ke WA
+            </button>
+            <button onclick="window.location.reload()" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                <i class="fas fa-plus"></i> Daftar Baru
+            </button>
+        </div>
+    </div>
+
+    <div id="adminSection" class="hidden max-w-7xl mx-auto mt-4">
+        <div class="glass-dashboard rounded-3xl p-8 mb-8 flex flex-col md:flex-row justify-between items-center shadow-2xl">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-3xl font-bold text-slate-800">Dashboard Admin</h1>
+                <p class="text-slate-600 mt-1">Data Pendaftar Wisuda Terkini</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="window.open(SPREADSHEET_URL, '_blank')" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition flex items-center gap-2 text-sm">
+                    <i class="fas fa-table"></i> Buka Spreadsheet
+                </button>
+                <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition text-sm">
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="glass-dashboard rounded-3xl p-6 shadow-2xl bg-white/90">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-list-alt mr-2 text-blue-600"></i> Daftar Pendaftar</h2>
+                <button onclick="loadAdminData()" class="text-blue-600 hover:text-blue-800 text-sm font-medium"><i class="fas fa-sync-alt mr-1"></i> Refresh Data</button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 border-b">
+                        <tr>
+                            <th class="px-6 py-4 rounded-tl-lg">Waktu Daftar</th>
+                            <th class="px-6 py-4">Mahasiswa</th>
+                            <th class="px-6 py-4">Prodi</th>
+                            <th class="px-6 py-4 text-center">Status Berkas</th>
+                            <th class="px-6 py-4 rounded-tr-lg text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <tr><td colspan="5" class="py-10 text-center"><div class="loader"></div> <br><span class="mt-2 text-gray-500 block">Menghubungkan ke database...</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================================
+        // KONFIGURASI WEB APP DAN GOOGLE SHEET (SUDAH DIUPDATE)
+        // ==========================================================
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPOk9n3u74NiFaDOPUlpblCYDVHXnflB0266cmJnrOalMk9WXzDBbtk6D5OVs2O7M-Tw/exec";
+        const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1j2Q9vb0qcc6yJjx9YJZRmGQr83PZxDRIwA91aNUoens/edit?gid=0#gid=0";
+        
+        let currentPayload = null; // Simpan data sementara untuk dikirim ke WA
+        // ==========================================================
+
+        // --- CEK LOGIN SAAT HALAMAN DIMUAT ---
+        window.onload = function() {
+            if (sessionStorage.getItem("isAdmin") === "true") {
+                showPage('adminSection');
+                loadAdminData();
+            }
+        };
+
+        function checkLogin() {
+            if (sessionStorage.getItem("isAdmin") === "true") {
+                showPage('adminSection');
+                loadAdminData();
+                return;
+            }
+
+            const pass = prompt("Masukkan Password Admin:");
+            if (pass === "admin123") {
+                sessionStorage.setItem("isAdmin", "true"); 
+                showPage('adminSection');
+                loadAdminData();
+            } else if (pass !== null) {
+                alert("Password Salah!");
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem("isAdmin"); 
+            showPage('inputSection');
+        }
+
+        // --- FUNGSI HITUNG YUDISIUM OTOMATIS ---
+        function hitungYudisium() {
+            const ipkValue = document.getElementById('input_ipk').value;
+            const yudisiumInput = document.getElementById('input_yudisium');
+            const ipk = parseFloat(ipkValue);
+            
+            if (isNaN(ipk)) { yudisiumInput.value = ""; return; }
+            if (ipk >= 3.51 && ipk <= 4.00) yudisiumInput.value = "Dengan Pujian";
+            else if (ipk >= 3.00 && ipk <= 3.50) yudisiumInput.value = "Sangat Memuaskan";
+            else if (ipk >= 2.75 && ipk <= 2.99) yudisiumInput.value = "Memuaskan";
+            else if (ipk > 0 && ipk < 2.75) yudisiumInput.value = "Cukup"; 
+            else yudisiumInput.value = "";
+        }
+
+        // --- FUNGSI LOAD DATA ADMIN ---
+        async function loadAdminData() {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center"><div class="loader"></div> <br><span class="mt-2 text-gray-500 block">Mengambil data dari Server...</span></td></tr>`;
+            
+            try {
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) throw new Error("Gagal terhubung ke Google Script.");
+
+                const text = await response.text();
+                let json;
+                try {
+                    json = JSON.parse(text);
+                } catch(e) {
+                    throw new Error("Backend belum di-Deploy ulang sebagai 'New Version'.");
+                }
+
+                if(json.status === "success") {
+                    if(json.data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10">Belum ada data pendaftar.</td></tr>`;
+                        return;
+                    }
+
+                    let html = '';
+                    json.data.forEach(item => {
+                        const statusBadge = item.link_folder && item.link_folder.startsWith('http') 
+                            ? `<span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-green-200">Berkas Masuk</span>` 
+                            : `<span class="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">Belum Lengkap</span>`;
+
+                        html += `
+                        <tr class="bg-white border-b hover:bg-gray-50 fade-in transition">
+                            <td class="px-6 py-4 text-xs text-gray-500">
+                                ${new Date(item.waktu).toLocaleString('id-ID')}
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                <div class="text-base font-bold uppercase">${item.nama}</div>
+                                <div class="text-xs text-gray-500">NPM: ${item.npm}</div>
+                            </td>
+                            <td class="px-6 py-4 text-xs">
+                                ${item.prodi}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                ${statusBadge}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="${item.link_folder}" target="_blank" class="text-blue-600 hover:text-blue-900 font-bold text-xs border border-blue-200 bg-blue-50 px-3 py-1 rounded-lg hover:bg-blue-100 transition">
+                                    <i class="fas fa-folder-open mr-1"></i> Buka Folder
+                                </a>
+                            </td>
+                        </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    throw new Error(json.message);
+                }
+
+            } catch (err) {
+                console.error(err);
+                if(err.message === "Failed to fetch") {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-red-500 font-bold"><i class="fas fa-times-circle text-2xl mb-2"></i><br>Error Koneksi Terputus.<br><span class="text-sm font-normal text-gray-600">Pastikan Akses Script di-set ke: <b>"Anyone"</b></span></td></tr>`;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-red-500 font-bold"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>${err.message}</td></tr>`;
+                }
+            }
+        }
+
+        // --- FUNGSI KOMPRESI & SIMPAN DATA FORMULIR ---
+        const processFile = (file) => new Promise((resolve, reject) => {
+            if (!file) { resolve(""); return; }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                if (file.type.startsWith('image/')) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 1000; 
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.6)); 
+                    };
+                } else {
+                    resolve(event.target.result);
+                }
+            };
+            reader.onerror = error => reject(error);
+        });
+
+        async function handleSimpan(e) {
+            e.preventDefault();
+            
+            if (SCRIPT_URL.includes("MASUKKAN_URL")) { alert("Error: URL Script belum dimasukkan!"); return; }
+
+            document.getElementById('btnSubmit').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('loadingMsg').innerText = "Mengompresi berkas...";
+
+            try {
+                const [ijazahB64, ktpB64, bebasB64, pkkmbB64] = await Promise.all([
+                    processFile(document.getElementById('file_ijazah').files[0]),
+                    processFile(document.getElementById('file_ktp').files[0]),
+                    processFile(document.getElementById('file_bebas').files[0]),
+                    processFile(document.getElementById('file_pkkmb').files[0])
+                ]);
+
+                // Format tanggal dari input (yyyy-mm-dd) ke format (dd/mm/yyyy)
+                const rawTglLulus = document.getElementById('input_tgl_lulus').value;
+                let formattedTglLulus = rawTglLulus;
+                if (rawTglLulus) {
+                    const parts = rawTglLulus.split('-');
+                    if (parts.length === 3) {
+                        formattedTglLulus = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                }
+
+                const payload = {
+                    gelombang: document.getElementById('input_gelombang').value,
+                    tahun: document.getElementById('input_tahun').value,
+                    nama: document.getElementById('input_nama').value,
+                    npm: document.getElementById('input_npm').value,
+                    prodi: document.getElementById('input_prodi').value,
+                    kelas: document.getElementById('input_kelas').value,
+                    jenjang: document.getElementById('input_jenjang').value,
+                    ttl: document.getElementById('input_ttl').value,
+                    jk: document.querySelector('input[name="jk"]:checked').value,
+                    nik: document.getElementById('input_nik').value,
+                    ibu: document.getElementById('input_ibu').value,
+                    email: document.getElementById('input_email').value,
+                    hp: document.getElementById('input_hp').value,
+                    tgl_lulus: formattedTglLulus,
+                    ipk: document.getElementById('input_ipk').value,
+                    yudisium: document.getElementById('input_yudisium').value,
+                    alamat: document.getElementById('input_alamat').value,
+                    judul_skripsi: document.getElementById('input_judul_skripsi').value,
+                    files: { ijazah: ijazahB64, ktp: ktpB64, bebas: bebasB64, pkkmb: pkkmbB64 }
+                };
+
+                currentPayload = payload;
+
+                document.getElementById('loadingMsg').innerText = "Mengirim data ke server (Mohon tunggu)...";
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    showPreview(payload);
+                    alert("Berhasil! Data Anda sudah tersimpan.");
+                } else {
+                    throw new Error(result.message);
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Gagal Mengirim: " + err.message + "\n\nTips: Jika koneksi lambat, coba kurangi ukuran file Anda.");
+                document.getElementById('btnSubmit').classList.remove('hidden');
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        // --- FUNGSI TAMPILKAN HASIL PREVIEW (FORMAL PDF) ---
+        function showPreview(data) {
+            document.getElementById('inputSection').classList.add('hidden');
+            document.getElementById('previewSection').classList.remove('hidden');
+            
+            document.getElementById('prev_gelombang').innerText = data.gelombang;
+            document.getElementById('prev_tahun').innerText = data.tahun;
+            document.getElementById('prev_nama').innerText = data.nama;
+            document.getElementById('prev_npm').innerText = data.npm;
+            document.getElementById('prev_prodi').innerText = data.prodi;
+            document.getElementById('prev_kelas').innerText = data.kelas;
+            document.getElementById('prev_jenjang').innerText = data.jenjang;
+            document.getElementById('prev_ttl').innerText = data.ttl;
+            document.getElementById('prev_jk').innerText = data.jk;
+            document.getElementById('prev_nik').innerText = data.nik;
+            document.getElementById('prev_ibu').innerText = data.ibu;
+            document.getElementById('prev_alamat').innerText = data.alamat;
+            document.getElementById('prev_judul_skripsi').innerText = data.judul_skripsi;
+            document.getElementById('prev_email').innerText = data.email;
+            document.getElementById('prev_hp').innerText = data.hp;
+            document.getElementById('prev_tgl_lulus').innerText = data.tgl_lulus; 
+            document.getElementById('prev_ipk').innerText = data.ipk;
+            document.getElementById('prev_yudisium').innerText = data.yudisium;
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', options);
+
+            window.scrollTo(0,0);
+        }
+
+        // --- FUNGSI KIRIM KE WHATSAPP ---
+        function sendToWhatsapp() {
+            if (!currentPayload) { alert("Data belum tersedia."); return; }
+            const p = currentPayload;
+            
+            const text = `Assalamualaikum, saya mahasiswa pendaftar wisuda:\n\n` +
+                         `Nama: ${p.nama}\n` +
+                         `NPM: ${p.npm}\n` +
+                         `Prodi: ${p.prodi}\n` +
+                         `Gelombang: ${p.gelombang} (${p.tahun})\n\n` +
+                         `Saya telah melakukan pendaftaran online dan menyimpan bukti PDF pendaftaran. Mohon diverifikasi. Terimakasih.`;
+                         
+            const targetNumber = "6289668098244"; 
+            window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // --- FUNGSI NAVIGASI HALAMAN ---
+        function showPage(id) { 
+            document.getElementById('inputSection').classList.add('hidden');
+            document.getElementById('previewSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            
+            document.getElementById(id).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
