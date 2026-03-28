@@ -141,7 +141,15 @@
                 </div>
             </div>
 
-            <div><label class="text-xs font-bold text-gray-500 uppercase">Alamat Rumah Lengkap</label><textarea id="input_alamat" class="w-full border-b py-2 focus:border-blue-600 outline-none h-16 resize-none" required></textarea></div>
+            <div>
+                <label class="text-xs font-bold text-gray-500 uppercase">Alamat Rumah Lengkap</label>
+                <textarea id="input_alamat" class="w-full border-b py-2 focus:border-blue-600 outline-none h-16 resize-none" required></textarea>
+            </div>
+            
+            <div class="mt-4">
+                <label class="text-xs font-bold text-gray-500 uppercase">Judul Skripsi</label>
+                <textarea id="input_judul_skripsi" class="w-full border-b py-2 focus:border-blue-600 outline-none h-16 resize-none" required></textarea>
+            </div>
 
             <!-- Lampiran Upload -->
             <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-400 mt-6">
@@ -240,6 +248,11 @@
                     <td id="prev_alamat" class="capitalize"></td>
                 </tr>
                 <tr>
+                    <td class="font-bold align-top">Judul Skripsi</td>
+                    <td class="align-top">:</td>
+                    <td id="prev_judul_skripsi" class="italic text-justify"></td>
+                </tr>
+                <tr>
                     <td class="font-bold">Email</td>
                     <td>:</td>
                     <td id="prev_email"></td>
@@ -303,13 +316,8 @@
                 <i class="fas fa-file-pdf"></i> 1. Cetak / Simpan PDF
             </button>
             
-            <!-- Langkah 2: Kirim WA -->
-            <button onclick="sendToWhatsapp()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
-                <i class="fab fa-whatsapp text-lg"></i> 2. Konfirmasi ke WA
-            </button>
-            
             <button onclick="window.location.reload()" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                <i class="fas fa-plus"></i> Daftar Baru
+                <i class="fas fa-plus"></i> 2. Daftar Baru
             </button>
         </div>
     </div>
@@ -363,8 +371,6 @@
         // ==========================================================
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPOk9n3u74NiFaDOPUlpblCYDVHXnflB0266cmJnrOalMk9WXzDBbtk6D5OVs2O7M-Tw/exec";
         const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1j2Q9vb0qcc6yJjx9YJZRmGQr83PZxDRIwA91aNUoens/edit?gid=0#gid=0";
-        
-        let currentPayload = null; // Simpan data untuk WA
         // ==========================================================
 
         // --- CEK LOGIN SAAT LOAD (PERSISTENCE) ---
@@ -521,6 +527,16 @@
                     processFile(document.getElementById('file_pkkmb').files[0])
                 ]);
 
+                // Format tanggal dari yyyy-mm-dd menjadi dd/mm/yyyy
+                const rawTglLulus = document.getElementById('input_tgl_lulus').value;
+                let formattedTglLulus = rawTglLulus;
+                if (rawTglLulus) {
+                    const parts = rawTglLulus.split('-');
+                    if (parts.length === 3) {
+                        formattedTglLulus = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                }
+
                 const payload = {
                     gelombang: document.getElementById('input_gelombang').value,
                     tahun: document.getElementById('input_tahun').value,
@@ -535,14 +551,13 @@
                     ibu: document.getElementById('input_ibu').value,
                     email: document.getElementById('input_email').value,
                     hp: document.getElementById('input_hp').value,
-                    tgl_lulus: document.getElementById('input_tgl_lulus').value,
+                    tgl_lulus: formattedTglLulus,
                     ipk: document.getElementById('input_ipk').value,
                     yudisium: document.getElementById('input_yudisium').value,
                     alamat: document.getElementById('input_alamat').value,
+                    judul_skripsi: document.getElementById('input_judul_skripsi').value,
                     files: { ijazah: ijazahB64, ktp: ktpB64, bebas: bebasB64, pkkmb: pkkmbB64 }
                 };
-
-                currentPayload = payload;
 
                 document.getElementById('loadingMsg').innerText = "Mengirim data ke server...";
 
@@ -585,9 +600,10 @@
             document.getElementById('prev_nik').innerText = data.nik;
             document.getElementById('prev_ibu').innerText = data.ibu;
             document.getElementById('prev_alamat').innerText = data.alamat;
+            document.getElementById('prev_judul_skripsi').innerText = data.judul_skripsi;
             document.getElementById('prev_email').innerText = data.email;
             document.getElementById('prev_hp').innerText = data.hp;
-            document.getElementById('prev_tgl_lulus').innerText = data.tgl_lulus;
+            document.getElementById('prev_tgl_lulus').innerText = data.tgl_lulus; // Sudah terformat dd/mm/yyyy di atas
             document.getElementById('prev_ipk').innerText = data.ipk;
             document.getElementById('prev_yudisium').innerText = data.yudisium;
             
@@ -596,27 +612,6 @@
             document.getElementById('prev_tanggal_cetak').innerText = new Date().toLocaleDateString('id-ID', options);
 
             window.scrollTo(0,0);
-        }
-
-        function sendToWhatsapp() {
-            if (!currentPayload) {
-                alert("Data belum tersedia.");
-                return;
-            }
-            
-            const p = currentPayload;
-            // Pesan WA: Konfirmasi + Instruksi kirim PDF
-            const text = `Assalamualaikum, saya mahasiswa pendaftar wisuda:\n\n` +
-                         `Nama: ${p.nama}\n` +
-                         `NPM: ${p.npm}\n` +
-                         `Prodi: ${p.prodi}\n` +
-                         `Gelombang: ${p.gelombang} (${p.tahun})\n\n` +
-                         `Saya telah melakukan pendaftaran online dan menyimpan bukti PDF. Mohon diverifikasi. Terimakasih.`;
-                         
-            const encodedText = encodeURIComponent(text);
-            const targetNumber = "6289668098244"; 
-            
-            window.open(`https://wa.me/${targetNumber}?text=${encodedText}`, '_blank');
         }
 
         function showPage(id) { 
