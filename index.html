@@ -87,14 +87,19 @@ function doGet(e) {
     const sheet = ss.getSheets()[0];
     const rows = sheet.getDataRange().getValues();
     
+    // Perbaikan: Cek jika data kosong (hanya header)
+    if (rows.length <= 1) {
+      return responseJSON({ status: "success", data: [] });
+    }
+    
     rows.shift(); // Hapus Header (Baris pertama)
     
     const result = rows.map(row => ({
-      waktu: row[0],
-      nama: row[3],
-      npm: row[4] ? row[4].toString().replace("'", "") : "", 
-      prodi: row[5],
-      hp: row[13] ? row[13].toString().replace("'", "") : "",
+      waktu: row[0] ? row[0] : "",
+      nama: row[3] ? row[3].toString() : "-",
+      npm: row[4] ? row[4].toString().replace(/'/g, "") : "-", 
+      prodi: row[5] ? row[5].toString() : "-",
+      hp: row[13] ? row[13].toString().replace(/'/g, "") : "-",
       link_folder: row[23] || row[19] || "" // Ambil link folder Drive (berada di kolom ke-24 / index 23)
     })).reverse(); // Urutkan dari yang terbaru ke terlama
 
