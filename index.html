@@ -17,27 +17,11 @@
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Tampilan Khusus Cetak (A4 Style) */
         @media print {
             .no-print { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
-            .glass-card { 
-                box-shadow: none; 
-                border: none; 
-                width: 100%; 
-                max-width: 100%; 
-                margin: 0; 
-                padding: 0; 
-                background: white;
-            }
-            #previewSection { 
-                display: block !important; 
-                position: absolute; 
-                top: 0; 
-                left: 0; 
-                width: 100%; 
-            }
-            /* Sembunyikan elemen lain saat print */
+            .glass-card { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; padding: 0; background: white; }
+            #previewSection { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
             #inputSection, #adminSection, nav { display: none !important; }
         }
     </style>
@@ -169,7 +153,7 @@
                         <input type="file" id="file_pkkmb" accept=".pdf,.jpg,.jpeg,.png" class="text-xs" required>
                     </div>
                 </div>
-                <p class="text-[10px] text-red-500 mt-2 italic">* Mohon tunggu proses upload (30-60 detik tergantung sinyal internet Anda).</p>
+                <p class="text-[10px] text-red-500 mt-2 italic">* Maksimal 2.5 MB per file (PDF/JPG/PNG).</p>
             </div>
 
             <div class="pt-6 flex flex-col items-center">
@@ -184,7 +168,6 @@
     </div>
 
     <div id="previewSection" class="hidden max-w-4xl mx-auto bg-white p-10 shadow-2xl min-h-screen relative rounded-xl mt-4">
-        
         <div class="text-center border-b-2 border-black pb-4 mb-6">
             <h1 class="text-2xl font-bold uppercase tracking-wider">Formulir Pendaftaran Wisuda</h1>
             <h2 class="text-xl font-bold uppercase mt-1">Fakultas Keguruan dan Ilmu Pendidikan</h2>
@@ -194,97 +177,29 @@
 
         <div class="px-2">
             <table class="w-full text-sm leading-8 border-none">
-                <tr>
-                    <td class="w-48 font-bold">Nama Lengkap</td>
-                    <td class="w-4">:</td>
-                    <td id="prev_nama" class="uppercase font-semibold"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">NPM</td>
-                    <td>:</td>
-                    <td id="prev_npm"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Program Studi</td>
-                    <td>:</td>
-                    <td id="prev_prodi"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Kelas / Jenjang</td>
-                    <td>:</td>
-                    <td><span id="prev_kelas"></span> / <span id="prev_jenjang"></span></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Tempat, Tanggal Lahir</td>
-                    <td>:</td>
-                    <td id="prev_ttl"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Jenis Kelamin</td>
-                    <td>:</td>
-                    <td id="prev_jk"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">NIK (KTP)</td>
-                    <td>:</td>
-                    <td id="prev_nik"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Nama Ibu Kandung</td>
-                    <td>:</td>
-                    <td id="prev_ibu"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Alamat Rumah</td>
-                    <td>:</td>
-                    <td id="prev_alamat" class="capitalize"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold align-top">Judul Skripsi</td>
-                    <td class="align-top">:</td>
-                    <td id="prev_judul_skripsi" class="italic text-justify"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Email</td>
-                    <td>:</td>
-                    <td id="prev_email"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">No. HP/WA</td>
-                    <td>:</td>
-                    <td id="prev_hp"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">Tanggal Kelulusan</td>
-                    <td>:</td>
-                    <td id="prev_tgl_lulus"></td>
-                </tr>
-                <tr>
-                    <td class="font-bold">IPK / Yudisium</td>
-                    <td>:</td>
-                    <td><span id="prev_ipk"></span> / <span id="prev_yudisium"></span></td>
-                </tr>
+                <tr><td class="w-48 font-bold">Nama Lengkap</td><td class="w-4">:</td><td id="prev_nama" class="uppercase font-semibold"></td></tr>
+                <tr><td class="font-bold">NPM</td><td>:</td><td id="prev_npm"></td></tr>
+                <tr><td class="font-bold">Program Studi</td><td>:</td><td id="prev_prodi"></td></tr>
+                <tr><td class="font-bold">Kelas / Jenjang</td><td>:</td><td><span id="prev_kelas"></span> / <span id="prev_jenjang"></span></td></tr>
+                <tr><td class="font-bold">Tempat, Tanggal Lahir</td><td>:</td><td id="prev_ttl"></td></tr>
+                <tr><td class="font-bold">Jenis Kelamin</td><td>:</td><td id="prev_jk"></td></tr>
+                <tr><td class="font-bold">NIK (KTP)</td><td>:</td><td id="prev_nik"></td></tr>
+                <tr><td class="font-bold">Nama Ibu Kandung</td><td>:</td><td id="prev_ibu"></td></tr>
+                <tr><td class="font-bold">Alamat Rumah</td><td>:</td><td id="prev_alamat" class="capitalize"></td></tr>
+                <tr><td class="font-bold align-top">Judul Skripsi</td><td class="align-top">:</td><td id="prev_judul_skripsi" class="italic text-justify"></td></tr>
+                <tr><td class="font-bold">Email</td><td>:</td><td id="prev_email"></td></tr>
+                <tr><td class="font-bold">No. HP/WA</td><td>:</td><td id="prev_hp"></td></tr>
+                <tr><td class="font-bold">Tanggal Kelulusan</td><td>:</td><td id="prev_tgl_lulus"></td></tr>
+                <tr><td class="font-bold">IPK / Yudisium</td><td>:</td><td><span id="prev_ipk"></span> / <span id="prev_yudisium"></span></td></tr>
             </table>
 
             <div class="mt-8 border-2 border-black p-4 bg-gray-50">
                 <p class="font-bold mb-3 underline text-sm">KELENGKAPAN BERKAS LAMPIRAN:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 text-sm gap-2">
-                    <div class="flex items-center gap-2">
-                        <i class="far fa-check-square text-lg"></i>
-                        <span>Foto kopi Ijazah Terakhir (Legalisir)</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="far fa-check-square text-lg"></i>
-                        <span>Foto kopi KTP</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="far fa-check-square text-lg"></i>
-                        <span>Surat Keterangan Bebas Biaya</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="far fa-check-square text-lg"></i>
-                        <span>Foto kopi Sertifikat PKKMB</span>
-                    </div>
+                    <div class="flex items-center gap-2"><i class="far fa-check-square text-lg"></i><span>Foto kopi Ijazah Terakhir (Legalisir)</span></div>
+                    <div class="flex items-center gap-2"><i class="far fa-check-square text-lg"></i><span>Foto kopi KTP</span></div>
+                    <div class="flex items-center gap-2"><i class="far fa-check-square text-lg"></i><span>Surat Keterangan Bebas Biaya</span></div>
+                    <div class="flex items-center gap-2"><i class="far fa-check-square text-lg"></i><span>Foto kopi Sertifikat PKKMB</span></div>
                 </div>
                 <p class="text-xs mt-3 italic">* Berkas fisik telah diunggah ke Database Google Drive Fakultas secara otomatis.</p>
             </div>
@@ -353,15 +268,12 @@
 
     <script>
         // ==========================================================
-        // KONFIGURASI WEB APP DAN GOOGLE SHEET (SUDAH DIUPDATE)
+        // KONFIGURASI WEB APP DAN GOOGLE SHEET
         // ==========================================================
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPOk9n3u74NiFaDOPUlpblCYDVHXnflB0266cmJnrOalMk9WXzDBbtk6D5OVs2O7M-Tw/exec";
         const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1j2Q9vb0qcc6yJjx9YJZRmGQr83PZxDRIwA91aNUoens/edit?gid=0#gid=0";
-        
-        let currentPayload = null; // Simpan data sementara
         // ==========================================================
 
-        // --- CEK LOGIN SAAT HALAMAN DIMUAT ---
         window.onload = function() {
             if (sessionStorage.getItem("isAdmin") === "true") {
                 showPage('adminSection');
@@ -419,7 +331,7 @@
                 try {
                     json = JSON.parse(text);
                 } catch(e) {
-                    throw new Error("Backend belum di-Deploy ulang sebagai 'New Version'.");
+                    throw new Error("Penyusuaian sistem sedang diproses atau Backend perlu diperbarui.");
                 }
 
                 if(json.status === "success") {
@@ -472,9 +384,17 @@
             }
         }
 
-        // --- FUNGSI KOMPRESI & SIMPAN DATA FORMULIR ---
-        const processFile = (file) => new Promise((resolve, reject) => {
+        // --- FUNGSI VALIDASI & KOMPRESI FILE SEBELUM DIKIRIM ---
+        const processFile = (file, fileLabel) => new Promise((resolve, reject) => {
             if (!file) { resolve(""); return; }
+            
+            // Batasan Ukuran (2.5 MB)
+            const maxSize = 2.5 * 1024 * 1024; 
+            if (file.size > maxSize) {
+                reject(new Error(`File ${fileLabel} terlalu besar! Maksimal 2.5 MB.`));
+                return;
+            }
+
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
@@ -494,10 +414,10 @@
                         resolve(canvas.toDataURL('image/jpeg', 0.6)); 
                     };
                 } else {
-                    resolve(event.target.result);
+                    resolve(event.target.result); // Jika PDF biarkan murni
                 }
             };
-            reader.onerror = error => reject(error);
+            reader.onerror = error => reject(new Error(`Gagal membaca file ${fileLabel}`));
         });
 
         async function handleSimpan(e) {
@@ -510,21 +430,19 @@
             document.getElementById('loadingMsg').innerText = "Mengompresi berkas...";
 
             try {
+                // Validasi dan kompres file
                 const [ijazahB64, ktpB64, bebasB64, pkkmbB64] = await Promise.all([
-                    processFile(document.getElementById('file_ijazah').files[0]),
-                    processFile(document.getElementById('file_ktp').files[0]),
-                    processFile(document.getElementById('file_bebas').files[0]),
-                    processFile(document.getElementById('file_pkkmb').files[0])
+                    processFile(document.getElementById('file_ijazah').files[0], "Ijazah"),
+                    processFile(document.getElementById('file_ktp').files[0], "KTP"),
+                    processFile(document.getElementById('file_bebas').files[0], "Bebas Biaya"),
+                    processFile(document.getElementById('file_pkkmb').files[0], "PKKMB")
                 ]);
 
-                // Format tanggal dari input (yyyy-mm-dd) ke format (dd/mm/yyyy)
                 const rawTglLulus = document.getElementById('input_tgl_lulus').value;
                 let formattedTglLulus = rawTglLulus;
                 if (rawTglLulus) {
                     const parts = rawTglLulus.split('-');
-                    if (parts.length === 3) {
-                        formattedTglLulus = `${parts[2]}/${parts[1]}/${parts[0]}`;
-                    }
+                    if (parts.length === 3) formattedTglLulus = `${parts[2]}/${parts[1]}/${parts[0]}`;
                 }
 
                 const payload = {
@@ -549,12 +467,12 @@
                     files: { ijazah: ijazahB64, ktp: ktpB64, bebas: bebasB64, pkkmb: pkkmbB64 }
                 };
 
-                currentPayload = payload;
-
                 document.getElementById('loadingMsg').innerText = "Mengirim data ke server (Mohon tunggu)...";
 
+                // Fetch dengan Header Plain Text agar aman dari CORS blokir
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
 
@@ -562,14 +480,13 @@
 
                 if (result.status === "success") {
                     showPreview(payload);
-                    alert("Berhasil! Data Anda sudah tersimpan.");
                 } else {
                     throw new Error(result.message);
                 }
 
             } catch (err) {
                 console.error(err);
-                alert("Gagal Mengirim: " + err.message + "\n\nTips: Jika koneksi lambat, coba kurangi ukuran file Anda.");
+                alert("Peringatan: " + err.message);
                 document.getElementById('btnSubmit').classList.remove('hidden');
                 document.getElementById('loading').classList.add('hidden');
             }
